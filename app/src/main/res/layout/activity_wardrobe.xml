@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#EBE6E2"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".clothes.Wardrobe">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="200dp"
+            android:layout_height="60dp"
+            app:srcCompat="@drawable/logo_login" />
+
+        <TextView
+            android:id="@+id/textView15"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/menu_friend"
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/menu" />
+
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#AAA09E" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="我的衣櫃"
+        android:textColor="@color/black"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="要記得定期整理唷!"
+        android:textColor="@color/black"
+        android:textSize="15dp" />
+
+    <ScrollView
+        android:background="#EBE6E2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 頭飾區域 -->
+            <LinearLayout
+                android:id="@+id/hat_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/view4"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#AAA09E" />
+
+                    <TextView
+                        android:id="@+id/hat_txv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="10dp"
+                        android:text="頭飾"
+                        android:textColor="@color/black"
+                        android:textSize="15dp" />
+
+                <View
+                    android:id="@+id/view2"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#AAA09E" />
+
+                <LinearLayout
+                    android:id="@+id/imagesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/hat1"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/hat2"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/hat3"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/hat4"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 洋裝區域 -->
+            <LinearLayout
+                android:id="@+id/dress_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/view5"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#AAA09E" />
+
+                <TextView
+                    android:id="@+id/dress_txv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="15dp"
+                    android:layout_margin="10dp"
+                    android:text="洋裝" />
+
+                <View
+                    android:id="@+id/view6"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#AAA09E" />
+
+                <LinearLayout
+                    android:id="@+id/dressimagesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/hairdressing1"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/dress2"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/dress3"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/dress4"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 上衣區域 -->
+            <LinearLayout
+                android:id="@+id/clothes_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/view1"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#AAA09E" />
+
+                <TextView
+                    android:id="@+id/clothes_txv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="上衣"
+                    android:textColor="@color/black"
+                    android:textSize="15dp" />
+
+                <View
+                    android:id="@+id/view3"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#AAA09E" />
+
+                <LinearLayout
+                    android:id="@+id/clothesimagesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/clothes1"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/clothes2"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/clothes3"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/clothes4"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 褲子區域 -->
+            <LinearLayout
+                android:id="@+id/pants_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/view7"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#AAA09E" />
+
+                <TextView
+                    android:id="@+id/pants_txv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="15dp"
+                    android:layout_margin="10dp"
+                    android:text="褲子" />
+
+                <View
+                    android:id="@+id/view8"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#AAA09E" />
+
+                <LinearLayout
+                    android:id="@+id/pantsimagesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/pants1"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/pants2"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/pants3"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/pants4"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 鞋子區域 -->
+            <LinearLayout
+                android:id="@+id/shoes_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/view10"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#AAA09E" />
+
+                <TextView
+                    android:id="@+id/shoes_txv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="鞋子"
+                    android:textColor="@color/black"
+                    android:textSize="15dp" />
+
+                <View
+                    android:id="@+id/view11"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#AAA09E" />
+
+                <LinearLayout
+                    android:id="@+id/shoesimagesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/shoes1"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/shoes2"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/shoes3"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:id="@+id/shoes4"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <View
+        android:id="@+id/view12"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#AAA09E" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/Home"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/home" />
+
+        <ImageView
+            android:id="@+id/Match"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/pencil" />
+
+        <ImageView
+            android:id="@+id/New_clothes"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/plus" />
+
+        <ImageView
+            android:id="@+id/Friend"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/users" />
+
+        <ImageView
+            android:id="@+id/set"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/settings" />
+
+    </LinearLayout>
+</LinearLayout>

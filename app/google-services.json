@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "167859099815",
+    "project_id": "e-clothes-ab3cc",
+    "storage_bucket": "e-clothes-ab3cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:167859099815:android:1607faf6a5d7ab86266382",
+        "android_client_info": {
+          "package_name": "tw.edu.pu.csim.s1102294.e_clothes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGadAsxhPOz7wET5pjwtJHU8KUFMXZOlY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- 朋友的頭貼圖片 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/friend_image"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_marginEnd="16dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_foreground"
+            app:shapeAppearanceOverlay="@style/CircularImageView"
+            app:strokeColor="@color/black" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- 用戶名 -->
+            <TextView
+                android:id="@+id/friend_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Username"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- 電子郵件 -->
+            <TextView
+                android:id="@+id/friend_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="user@example.com"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/accept"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="#D5CFCE"
+                android:src="@drawable/check"
+                app:shapeAppearanceOverlay="@style/CircularImageView" />
+
+            <TextView
+                android:id="@+id/textView21"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/decline"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="#D5CFCE"
+                android:src="@drawable/cross"
+                app:shapeAppearanceOverlay="@style/CircularImageView" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 用戶名和電子郵件容器 -->
+    <View
+        android:id="@+id/view1"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="10dp"
+        android:background="#AAA09E" />
+
+</LinearLayout>

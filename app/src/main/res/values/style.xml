@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyEditText" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">#6D6367</item>
+        <item name="colorControlActivated">#6D6367</item>
+    </style>
+
+    <style name="MenuStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColor">#67595E</item>
+        <item name="android:popupBackground">#AAA09E</item> <!-- 背景顏色 -->
+        <!-- 設定自定義的 PopupMenu 樣式 -->
+        <item name="android:popupMenuStyle">@style/CustomPopupMenu</item>
+    </style>
+
+    <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">#AAA09E</item> <!-- 修改背景色 -->
+        <item name="android:textColor">#67595E</item> <!-- 修改文字顏色 -->
+    </style>
+
+    <style name="CircularImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+</resources>
