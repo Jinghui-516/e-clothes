@@ -1,86 +1,120 @@
 package tw.edu.pu.csim.s1102294.e_clothes.Match
 
-import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.Toast
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Liked_Post
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import tw.edu.pu.csim.s1102294.e_clothes.R
-import tw.edu.pu.csim.s1102294.e_clothes.Setting
-import tw.edu.pu.csim.s1102294.e_clothes.home
+import java.util.*
 
 class share_Match : AppCompatActivity() {
 
-    lateinit var Home: ImageView
-    lateinit var Match: ImageView
+    private val imageUris = mutableListOf<Uri>()
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private lateinit var progressBar: ProgressBar
+    private lateinit var btnShare: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_share_match)
 
-        Home = findViewById(R.id.Home)
-        Home.setOnClickListener {
-//            Home.text = ""
-            val intent1 = Intent(this, home::class.java)
-            startActivity(intent1)
-            finish()
-        }
+        val rvPreviews: RecyclerView = findViewById(R.id.rv_image_previews)
+        val etCaption: EditText = findViewById(R.id.et_caption)
+        btnShare = findViewById(R.id.btn_share)
+        val btnCancel: TextView = findViewById(R.id.btn_cancel)
+        progressBar = findViewById(R.id.upload_progress)
 
-        Match = findViewById(R.id.Match)
-        Match.setOnClickListener {
-//            Home.text = ""
-            val intent1 = Intent(this, Match_home::class.java)
-            startActivity(intent1)
-            finish()
-        }
+        // 1. 接收多張圖片的 Uri 列表
+        val uriStrings = intent.getStringArrayListExtra("selected_images_uris")
+        uriStrings?.forEach { imageUris.add(Uri.parse(it)) }
 
-        val menu_share = findViewById<ImageView>(R.id.menu_share)
-        menu_share.setOnClickListener {
-            val popup = PopupMenu(this, menu_share)
-            popup.menuInflater.inflate(R.menu.menu_share, popup.menu)
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.add -> {
-                        Toast.makeText(this, "編輯個人資料", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, edit_Profile::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    R.id.check -> {
-                        Toast.makeText(this, "編輯精選穿搭", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, edit_Chosen_Match::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    R.id.share -> {
-                        Toast.makeText(this, "分享搭配", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, share_Match::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    R.id.like -> {
-                        Toast.makeText(this, "喜歡的貼文", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, Liked_Post::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    R.id.settings -> {
-                        Toast.makeText(this, "設定", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, Setting::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    else -> false
-                }
+        // 2. 設定 RecyclerView 展示圖片
+        rvPreviews.adapter = ImagePreviewAdapter(imageUris)
+
+        btnCancel.setOnClickListener { finish() }
+
+        // 3. 分享按鈕
+        btnShare.setOnClickListener {
+            val caption = etCaption.text.toString().trim()
+            if (imageUris.isEmpty()) {
+                Toast.makeText(this, "請至少選擇一張照片", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-            popup.show()
+
+            btnShare.isEnabled = false
+            startMultiUpload(caption)
         }
+    }
+
+    // 🌟 核心：處理多張圖片上傳
+    private fun startMultiUpload(caption: String) {
+        progressBar.visibility = View.VISIBLE
+        val uploadedUrls = mutableListOf<String>()
+        var uploadCount = 0
+
+        for (uri in imageUris) {
+            val ref = FirebaseStorage.getInstance().reference.child("posts/${UUID.randomUUID()}.jpg")
+            ref.putFile(uri).addOnSuccessListener {
+                ref.downloadUrl.addOnSuccessListener { downloadUrl ->
+                    uploadedUrls.add(downloadUrl.toString())
+                    uploadCount++
+
+                    // 當所有照片都上傳成功後，才寫入資料庫
+                    if (uploadCount == imageUris.size) {
+                        saveToFirestore(caption, uploadedUrls)
+                    }
+                }
+            }.addOnFailureListener {
+                progressBar.visibility = View.GONE
+                btnShare.isEnabled = true
+                Toast.makeText(this, "上傳失敗，請重試", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun saveToFirestore(caption: String, imageUrls: List<String>) {
+        val email = auth.currentUser?.email ?: "anonymous"
+        val postData = hashMapOf(
+            "userEmail" to email,
+            "imageUrls" to imageUrls, // 這裡現在是一個網址清單 (List)
+            "caption" to caption,
+            "timestamp" to System.currentTimeMillis(),
+            "likes" to 0,
+            "likedBy" to listOf<String>()
+        )
+
+        db.collection("AllPosts").add(postData).addOnSuccessListener {
+            Toast.makeText(this, "發布成功！", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+    }
+
+    // 🌟 內部 Adapter 用於顯示預覽圖
+    inner class ImagePreviewAdapter(private val uris: List<Uri>) :
+        RecyclerView.Adapter<ImagePreviewAdapter.ViewHolder>() {
+
+        inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+            val img: ImageView = v.findViewById(R.id.iv_item_preview)
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.item_image_preview, parent, false)
+            return ViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            Glide.with(holder.itemView.context).load(uris[position]).into(holder.img)
+        }
+
+        override fun getItemCount() = uris.size
     }
 }

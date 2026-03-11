@@ -64,6 +64,7 @@ class new_match_dress : AppCompatActivity(), GestureDetector.OnGestureListener {
     }
 
     override fun onDown(p0: MotionEvent): Boolean {
+        // ... inside your new_match_dress class ...override fun onDown(p0: MotionEvent): Boolean { // Note: onDown p0 can usually be non-null, but consistency helps
         return true
     }
 
@@ -74,58 +75,49 @@ class new_match_dress : AppCompatActivity(), GestureDetector.OnGestureListener {
         return true
     }
 
-    override fun onScroll(p0: MotionEvent, p1: MotionEvent, p2: Float, p3: Float): Boolean {
+    // Change p0: MotionEvent to p0: MotionEvent?
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
         return true
     }
 
     override fun onLongPress(p0: MotionEvent) {
-
     }
 
-    override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+    // Change e1: MotionEvent to e1: MotionEvent?
+    override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
         val density = Resources.getSystem().displayMetrics.density
-        val dpValue = 150 // 要转换为像素的 dp 值
+        val dpValue = 150
         val pixels = (dpValue * density).toInt()
 
-        if (Math.abs(velocityX) > Math.abs(velocityY) &&  e1.y >= (pixels+imghat.top) && e1.y <= (pixels+imghat.bottom)) {
-            //Math.abs(velocityX) > Math.abs(velocityY)判斷是水平滑動還是垂直
-            if (e1.x >= e2.x) {
-                currentImageIndex1++
-                if (currentImageIndex1 >= hat.size) {
-                    currentImageIndex1 = 0
+        // Use the safe call operator ?. or !! because e1 is now nullable
+        if (e1 != null) {
+            if (Math.abs(velocityX) > Math.abs(velocityY) &&  e1.y >= (pixels+imghat.top) && e1.y <= (pixels+imghat.bottom)) {
+                if (e1.x >= e2.x) {
+                    currentImageIndex1++
+                    if (currentImageIndex1 >= hat.size) currentImageIndex1 = 0
+                } else {
+                    currentImageIndex1--
+                    if (currentImageIndex1 < 0) currentImageIndex1 = hat.size - 1
                 }
-            } else {
-                currentImageIndex1--
-                if (currentImageIndex1 < 0) {
-                    currentImageIndex1 = hat.size - 1
+            } else if(Math.abs(velocityX) > Math.abs(velocityY) &&  e1.y >= (pixels+imgdress.top) && e1.y <= (pixels+imgdress.bottom)) {
+                if (e1.x >= e2.x) {
+                    currentImageIndex2++
+                    if (currentImageIndex2 >= dress.size) currentImageIndex2 = 0
+                } else {
+                    currentImageIndex2--
+                    if (currentImageIndex2 < 0) currentImageIndex2 = dress.size - 1
                 }
-            }
-        }else if(Math.abs(velocityX) > Math.abs(velocityY) &&  e1.y >= (pixels+imgdress.top) && e1.y <= (pixels+imgdress.bottom)) {
-            if (e1.x >= e2.x) {
-                currentImageIndex2++
-                if (currentImageIndex2 >= dress.size) {
-                    currentImageIndex2 = 0
-                }
-            } else {
-                currentImageIndex2--
-                if (currentImageIndex2 < 0) {
-                    currentImageIndex2 = dress.size - 1
-                }
-            }
-
-        }else if(Math.abs(velocityX) > Math.abs(velocityY) &&  e1.y >= (pixels+imgshoes.top) && e1.y <= (pixels+imgshoes.bottom)) {
-            if (e1.x >= e2.x) {
-                currentImageIndex3++
-                if (currentImageIndex3 >= shoes.size) {
-                    currentImageIndex3 = 0
-                }
-            } else {
-                currentImageIndex3--
-                if (currentImageIndex3 < 0) {
-                    currentImageIndex3 = shoes.size - 1
+            } else if(Math.abs(velocityX) > Math.abs(velocityY) &&  e1.y >= (pixels+imgshoes.top) && e1.y <= (pixels+imgshoes.bottom)) {
+                if (e1.x >= e2.x) {
+                    currentImageIndex3++
+                    if (currentImageIndex3 >= shoes.size) currentImageIndex3 = 0
+                } else {
+                    currentImageIndex3--
+                    if (currentImageIndex3 < 0) currentImageIndex3 = shoes.size - 1
                 }
             }
         }
+
         imghat.setImageResource(hat[currentImageIndex1])
         imgdress.setImageResource(dress[currentImageIndex2])
         imgshoes.setImageResource(shoes[currentImageIndex3])

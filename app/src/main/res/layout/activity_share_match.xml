@@ -4,141 +4,116 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#EBE6E2"
+    android:background="@color/brand_background"
     android:orientation="vertical"
     tools:context=".Match.share_Match">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="200dp"
-            android:layout_height="60dp"
-            app:srcCompat="@drawable/logo_login" />
+        android:background="@color/white"
+        android:paddingHorizontal="16dp">
 
         <TextView
-            android:id="@+id/textView15"
-            android:layout_width="200dp"
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_centerVertical="true"
+            android:text="取消"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp" />
 
-        <ImageView
-            android:id="@+id/menu_share"
-            android:layout_width="50dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            app:srcCompat="@drawable/menu" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="新貼文"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/btn_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="分享"
+            android:textColor="@color/brand_primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
+    <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#AAA09E"
-        android:orientation="vertical"></LinearLayout>
+        android:background="@color/divider_line" />
 
-    <TextView
-        android:id="@+id/textView11"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="分享你的搭配吧!"
-        android:textColor="@color/black"
-        android:textSize="20dp" />
-
-    <TextView
-        android:id="@+id/textView13"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="今天的你也很美麗~"
-        android:textColor="@color/black"
-        android:textSize="15dp" />
-
-    <TextView
-        android:id="@+id/textView14"
-        android:layout_width="match_parent"
-        android:layout_height="25dp" />
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:fillViewport="true">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#AAA09E"
-            android:orientation="vertical"></LinearLayout>
-
-        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="陰天?"
-            android:textColor="@color/black"
-            android:textSize="15dp" />
+            android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#AAA09E"
-            android:orientation="vertical"></LinearLayout>
-    </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_image_previews"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:layout_marginTop="8dp"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#AAA09E"
-        android:orientation="vertical"></LinearLayout>
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/divider_line"
+                app:strokeWidth="1dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-        <ImageView
-            android:id="@+id/Home"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/home" />
+                <EditText
+                    android:id="@+id/et_caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:gravity="top"
+                    android:hint="分享你的穿搭靈感或心情..."
+                    android:minLines="5"
+                    android:padding="16dp"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/brand_secondary"
+                    android:textSize="15sp" />
+            </com.google.android.material.card.MaterialCardView>
 
-        <ImageView
-            android:id="@+id/Match"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/pencil" />
+            <ProgressBar
+                android:id="@+id/upload_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="32dp"
+                android:layout_marginTop="16dp"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/brand_primary"
+                android:visibility="gone" />
 
-        <ImageView
-            android:id="@+id/New_clothes"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/plus" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp"
+                android:text="正在發布中，請稍候..."
+                android:textColor="@color/brand_primary"
+                android:textSize="12sp"
+                android:visibility="gone"
+                android:id="@+id/tv_uploading_status" />
 
-        <ImageView
-            android:id="@+id/imageView9"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/users" />
-
-        <ImageView
-            android:id="@+id/imageView8"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/settings" />
-
-    </LinearLayout>
-
-
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

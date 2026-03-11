@@ -1,80 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginBottom="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/match_name"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="搭配名稱"
-            android:textSize="18sp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/weather_category"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="天氣種類"
-            android:textSize="14sp" />
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/user"
+                app:tint="@color/brand_primary"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
+
+                <TextView
+                    android:id="@+id/match_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="搭配名稱"
+                    android:textColor="@color/text_primary"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/weather_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="#天氣種類"
+                    android:textColor="@color/brand_secondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_more"
+                app:tint="@color/text_hint" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:baselineAligned="false">
 
             <ImageView
                 android:id="@+id/hat_image"
-                android:layout_width="100dp"
+                android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
-                android:contentDescription="Hat Image"
-                android:src="@drawable/ic_launcher_background" />
+                android:scaleType="centerCrop"
+                android:background="@color/divider_line"
+                android:layout_marginEnd="4dp" />
 
             <ImageView
                 android:id="@+id/clothes_image"
-                android:layout_width="100dp"
+                android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
-                android:contentDescription="Clothes Image"
-                android:src="@drawable/ic_launcher_background" />
+                android:scaleType="centerCrop"
+                android:background="@color/divider_line"
+                android:layout_marginEnd="4dp" />
 
             <ImageView
                 android:id="@+id/pants_image"
-                android:layout_width="100dp"
+                android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
-                android:contentDescription="Pants Image"
-                android:src="@drawable/ic_launcher_background" />
+                android:scaleType="centerCrop"
+                android:background="@color/divider_line"
+                android:layout_marginEnd="4dp" />
 
             <ImageView
                 android:id="@+id/shoes_image"
-                android:layout_width="100dp"
+                android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_weight="1"
-                android:contentDescription="Shoes Image"
-                android:src="@drawable/ic_launcher_background" />
+                android:scaleType="centerCrop"
+                android:background="@color/divider_line" />
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp">
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@android:drawable/btn_star_big_off"
+                app:tint="@color/brand_primary"/>
+
+            <Space android:layout_width="16dp" android:layout_height="wrap_content"/>
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@android:drawable/ic_dialog_email"
+                app:tint="@color/brand_primary"/>
+
+            <Space android:layout_width="16dp" android:layout_height="wrap_content"/>
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@android:drawable/ic_menu_share"
+                app:tint="@color/brand_primary"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_save"
+                app:tint="@color/text_hint" />
+        </LinearLayout>
+
     </LinearLayout>
-
-
-    <!--    <TextView-->
-<!--        android:id="@+id/tags"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="標籤:"-->
-<!--        android:padding="8dp"/>-->
-    <View
-        android:id="@+id/view1"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="10dp"
-        android:background="#AAA09E" />
-
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

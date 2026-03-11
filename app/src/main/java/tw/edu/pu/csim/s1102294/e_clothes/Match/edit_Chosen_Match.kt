@@ -93,10 +93,13 @@ class edit_Chosen_Match : AppCompatActivity(), GestureDetector.OnGestureListener
         }
     }
 
+    // ... inside edit_Chosen_Match class
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         gDetector.onTouchEvent(event)
         return true
     }
+
     override fun onDown(p0: MotionEvent): Boolean {
         return true
     }
@@ -108,40 +111,26 @@ class edit_Chosen_Match : AppCompatActivity(), GestureDetector.OnGestureListener
         return true
     }
 
-    override fun onScroll(p0: MotionEvent, p1: MotionEvent, p2: Float, p3: Float): Boolean {
+    // Fix: p0 (e1) must be nullable MotionEvent?
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
         return true
     }
 
     override fun onLongPress(p0: MotionEvent) {
-
     }
 
-    override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-        if (e1.x >= e2.x) {
+    // Fix: e1 must be nullable MotionEvent?
+    override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+        // Use safe call ?.x or let the IDE smart-cast it
+        if (e1 != null && e1.x >= e2.x) {
             count++
-            if (count > 5) {
-                count = 1
-            }
-        }
-        else{
-            count --
-            if (count < 1){
-                count = 5
-            }
-        }
-
-        if (count == 1) {
-            pages.text = "(1/5)"
-        } else if(count == 2) {
-            pages.text = "(2/5)"
-        } else if(count == 3) {
-            pages.text = "(3/5)"
-        } else if(count == 4) {
-            pages.text = "(4/5)"
+            if (count > 5) count = 1
         } else {
-            pages.text = "(5/5)"
+            count--
+            if (count < 1) count = 5
         }
 
+        pages.text = "($count/5)"
         return true
     }
 }

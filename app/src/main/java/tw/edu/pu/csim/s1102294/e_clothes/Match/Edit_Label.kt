@@ -320,19 +320,27 @@ class Edit_Label : AppCompatActivity(), GestureDetector.OnGestureListener {
         return gDetector.onTouchEvent(event) || super.onTouchEvent(event)
     }
 
-    override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-        if (e1.x - e2.x > 50) {
-            currentImageIndex = (currentImageIndex + 1) % imageUrls.size
-        } else if (e2.x - e1.x > 50) {
-            currentImageIndex = (currentImageIndex - 1 + imageUrls.size) % imageUrls.size
+    // 1. 將 e1 修改為 MotionEvent? (增加問號)
+    override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+        // 因為 e1 可能為空，所以使用 e1?.x 安全調用或 if 判斷
+        if (e1 != null) {
+            if (e1.x - e2.x > 50) {
+                currentImageIndex = (currentImageIndex + 1) % imageUrls.size
+            } else if (e2.x - e1.x > 50) {
+                currentImageIndex = (currentImageIndex - 1 + imageUrls.size) % imageUrls.size
+            }
+            updateImage()
         }
-        updateImage()
         return true
+    }
+
+    // 2. 將 e1 修改為 MotionEvent? (增加問號)
+    override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+        return false
     }
 
     override fun onDown(e: MotionEvent): Boolean = true
     override fun onShowPress(e: MotionEvent) {}
     override fun onLongPress(e: MotionEvent) {}
-    override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean = false
     override fun onSingleTapUp(e: MotionEvent): Boolean = true
 }

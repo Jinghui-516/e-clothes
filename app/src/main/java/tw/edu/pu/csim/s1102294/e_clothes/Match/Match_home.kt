@@ -1,218 +1,141 @@
 package tw.edu.pu.csim.s1102294.e_clothes.Match
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.view.ContextThemeWrapper
+import android.widget.LinearLayout
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.google.firebase.auth.FirebaseAuth
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestore
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Friends
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Liked_Post
+import com.google.firebase.firestore.Query
+import tw.edu.pu.csim.s1102294.e_clothes.Community.Personal_Page
 import tw.edu.pu.csim.s1102294.e_clothes.R
-import tw.edu.pu.csim.s1102294.e_clothes.Setting
-import tw.edu.pu.csim.s1102294.e_clothes.clothes.choose_add
+import tw.edu.pu.csim.s1102294.e_clothes.clothes.Wardrobe
 import tw.edu.pu.csim.s1102294.e_clothes.home
 
 class Match_home : AppCompatActivity() {
 
-    // MatchAdapter to bind data to RecyclerView
-    class MatchAdapter(private var matchList: List<Match>) : RecyclerView.Adapter<MatchAdapter.MatchViewHolder>() {
+    private lateinit var bottomNavigationView: BottomNavigationView
+    private lateinit var fabAddPost: FloatingActionButton
+    private lateinit var matchRecyclerView: RecyclerView
+    private val db = FirebaseFirestore.getInstance()
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MatchViewHolder {
-            val view =
-                LayoutInflater.from(parent.context).inflate(R.layout.match_item, parent, false)
-            return MatchViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: MatchViewHolder, position: Int) {
-            val match = matchList[position]
-            holder.bind(match)
-        }
-
-        override fun getItemCount(): Int = matchList.size
-
-        fun updateMatches(newMatches: List<Match>) {
-            matchList = newMatches
-            notifyDataSetChanged()
-        }
-
-        inner class MatchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            private val matchNameTextView: TextView = itemView.findViewById(R.id.match_name)
-            private val weatherCategoryTextView: TextView =
-                itemView.findViewById(R.id.weather_category)
-            private val hatImageView: ImageView = itemView.findViewById(R.id.hat_image)
-            private val clothesImageView: ImageView = itemView.findViewById(R.id.clothes_image)
-            private val pantsImageView: ImageView = itemView.findViewById(R.id.pants_image)
-            private val shoesImageView: ImageView = itemView.findViewById(R.id.shoes_image)
-
-            fun bind(match: Match) {
-                // Log to ensure the correct match data is being bound
-                Log.d("MatchViewHolder", "Binding match: $match")
-
-                matchNameTextView.text = match.搭配名稱
-                weatherCategoryTextView.text = match.天氣種類
-
-                // Load images using Glide or other image loading methods
-                Glide.with(itemView.context).load(match.帽子圖片網址).into(hatImageView)
-                Glide.with(itemView.context).load(match.上衣圖片網址).into(clothesImageView)
-                Glide.with(itemView.context).load(match.褲子圖片網址).into(pantsImageView)
-                Glide.with(itemView.context).load(match.鞋子圖片網址).into(shoesImageView)
-
-                itemView.setOnClickListener {
-                    navigateToMatchDetail(match)
-                }
-            }
-
-            private fun navigateToMatchDetail(match: Match) {
-                val intent = Intent(itemView.context, Matching_details::class.java)
-                intent.putExtra("matchData", match)  // Assuming Match is Serializable or Parcelable
-                itemView.context.startActivity(intent)
-            }
+    // 🌟 多選照片啟動器 (最高 9 張)
+    private val pickMultipleImageLauncher = registerForActivityResult(
+        ActivityResultContracts.PickMultipleVisualMedia(9)
+    ) { uris: List<Uri> ->
+        if (uris.isNotEmpty()) {
+            val uriStringList = ArrayList(uris.map { it.toString() })
+            val intent = Intent(this, share_Match::class.java)
+            intent.putStringArrayListExtra("selected_images_uris", uriStringList)
+            startActivity(intent)
         }
     }
-
-    lateinit var Home: ImageView
-    lateinit var newMatch: ImageView
-    lateinit var Friend: ImageView
-    lateinit var Clothes: ImageView
-    lateinit var set: ImageView
-    private val matchList = mutableListOf<Match>()
-    private lateinit var matchRecyclerView: RecyclerView
-    private lateinit var matchAdapter: MatchAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_match_home)
 
-        // Initialize the navigation buttons
-        Home = findViewById(R.id.Home)
-        Home.setOnClickListener {
-            val intent1 = Intent(this, home::class.java)
-            startActivity(intent1)
-            finish()
-        }
-
-        newMatch = findViewById(R.id.newMatch)
-        newMatch.setOnClickListener {
-            val intent2 = Intent(this, Match_home::class.java)
-            startActivity(intent2)
-            finish()
-        }
-
-        Clothes = findViewById(R.id.Clothes)
-        Clothes.setOnClickListener {
-            val intent = Intent(this, choose_add::class.java)
-            startActivity(intent)
-            finish()
-        }
-
-        Friend = findViewById(R.id.Friend)
-        Friend.setOnClickListener {
-            val intent1 = Intent(this, Friends::class.java)
-            startActivity(intent1)
-            finish()
-        }
-
-        set = findViewById(R.id.set)
-        set.setOnClickListener {
-            val intent1 = Intent(this, Setting::class.java)
-            startActivity(intent1)
-            finish()
-        }
-
-        // Initialize PopupMenu for actions
-        val menu_catch = findViewById<ImageView>(R.id.menu_catch)
-        menu_catch.setOnClickListener {
-            val popupMenu = PopupMenu(ContextThemeWrapper(this, R.style.CustomPopupMenu), menu_catch)
-            popupMenu.inflate(R.menu.menu_pop)
-
-            popupMenu.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.add -> {
-                        Toast.makeText(this, "新增搭配", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, New_Match::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    R.id.check -> {
-                        Toast.makeText(this, "查看搭配", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, Match_home::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    R.id.share -> {
-                        Toast.makeText(this, "分享搭配", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, share_Match::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    else -> false
-                }
-            }
-            popupMenu.show()  // 顯示 PopupMenu
-        }
-
-        // Set up RecyclerView for displaying matches
+        // 1. 初始化 UI 元件
         matchRecyclerView = findViewById(R.id.match_recycler_view)
+        fabAddPost = findViewById(R.id.fab_add_post)
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
+
+        // 2. 設定 RecyclerView
         matchRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Initialize the adapter with an empty list
-        matchAdapter = MatchAdapter(emptyList())
-        matchRecyclerView.adapter = matchAdapter
+        // 3. 點擊 + 號彈出選單
+        fabAddPost.setOnClickListener {
+            showPostOptions()
+        }
 
-        // Fetch the "搭配" data from Firestore
-        fetchMatchDataFromFirestore()
+        // 4. 從資料庫抓取貼文
+        fetchPosts()
+
+        // 5. 導覽列邏輯
+        setupNavigation()
     }
 
-    // Fetch matching data from Firestore based on the current user's email
-    private fun fetchMatchDataFromFirestore() {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            val email = currentUser.email
-            val db = FirebaseFirestore.getInstance()
+    // 🌟 核心功能：監聽 Firestore 貼文更新
+    private fun fetchPosts() {
+        // 按照時間戳記由新到舊排序
+        db.collection("AllPosts")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .addSnapshotListener { value, error ->
+                if (error != null) return@addSnapshotListener
 
-            if (email != null) {
-                db.collection(email)
-                    .get()
-                    .addOnSuccessListener { documents ->
-                        matchList.clear() // Clear the existing list to reload fresh data
-                        if (documents.isEmpty) {
-                            Log.e("Firestore", "No documents found!")
-                        } else {
-                            for (document in documents) {
-                                val match = document.toObject(Match::class.java)
-                                if (match.isValid()) {
-                                    matchList.add(match)
-                                } else {
-                                    Log.d("MatchData", "Invalid match: $match")
-                                }
-                            }
+                val posts = mutableListOf<Post>()
+                for (doc in value!!) {
+                    // 將資料庫文件轉換成 Post 物件
+                    val post = doc.toObject(Post::class.java)
+                    posts.add(post)
+                }
 
-                            // Update the RecyclerView with the new list of matches
-                            runOnUiThread {
-                                matchAdapter.updateMatches(matchList)
-                            }
-                        }
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("MatchActivity", "Error fetching data: ${e.message}")
-                    }
+                // 將資料餵給 Adapter
+                matchRecyclerView.adapter = PostAdapter(posts)
+            }
+    }
+
+    private fun showPostOptions() {
+        val dialog = BottomSheetDialog(this)
+        val view = LayoutInflater.from(this).inflate(R.layout.layout_post_options, null)
+
+        val btnPhoto = view.findViewById<LinearLayout>(R.id.option_photo)
+        val btnText = view.findViewById<LinearLayout>(R.id.option_text)
+
+        btnPhoto.setOnClickListener {
+            dialog.dismiss()
+            pickMultipleImageLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
+        }
+
+        btnText.setOnClickListener {
+            dialog.dismiss()
+            startActivity(Intent(this, share_Match::class.java))
+        }
+
+        dialog.setContentView(view)
+        dialog.show()
+    }
+
+    private fun setupNavigation() {
+        bottomNavigationView.selectedItemId = R.id.nav_community
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_weather -> {
+                    startActivity(Intent(this, home::class.java))
+                    overridePendingTransition(0, 0)
+                    finish()
+                    true
+                }
+                R.id.nav_wardrobe -> {
+                    startActivity(Intent(this, Wardrobe::class.java))
+                    overridePendingTransition(0, 0)
+                    finish()
+                    true
+                }
+                R.id.nav_rank -> {
+                    startActivity(Intent(this, Rank::class.java))
+                    overridePendingTransition(0, 0)
+                    finish()
+                    true
+                }
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, Personal_Page::class.java))
+                    overridePendingTransition(0, 0)
+                    finish()
+                    true
+                }
+                else -> true
             }
         }
     }
-
 }

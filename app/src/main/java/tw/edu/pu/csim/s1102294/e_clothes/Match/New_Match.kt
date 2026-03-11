@@ -100,21 +100,28 @@ class New_Match : AppCompatActivity(), GestureDetector.OnGestureListener {
         return true
     }
 
-    override fun onDown(p0: MotionEvent): Boolean = true
+    // 1. 修改 onDown, onShowPress, onSingleTapUp, onLongPress 的參數名為 e (可選，但建議一致)
+    override fun onDown(e: MotionEvent): Boolean = true
 
-    override fun onShowPress(p0: MotionEvent) {}
+    override fun onShowPress(e: MotionEvent) {}
 
-    override fun onSingleTapUp(p0: MotionEvent): Boolean = true
+    override fun onSingleTapUp(e: MotionEvent): Boolean = true
 
-    override fun onScroll(p0: MotionEvent, p1: MotionEvent, p2: Float, p3: Float): Boolean = true
+    // 2. 修改 onScroll：第一個參數 p0 必須加上問號 ?
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean = true
 
-    override fun onLongPress(p0: MotionEvent) {}
+    override fun onLongPress(e: MotionEvent) {}
 
-    override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+    // 3. 修改 onFling：第一個參數 e1 必須加上問號 ?
+    override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+        // 因為 e1 現在是 MotionEvent?，必須先判斷是否為 null
+        if (e1 == null) return false
+
         val density = Resources.getSystem().displayMetrics.density
         val dpValue = 200
         val pixels = (dpValue * density).toInt()
 
+        // 使用 Math.abs 判斷滑動方向
         if (Math.abs(velocityX) > Math.abs(velocityY) && e1.y >= (pixels + imghat.top) && e1.y <= (pixels + imghat.bottom)) {
             if (e1.x >= e2.x) {
                 currentImageIndex1++

@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         val timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {
-                val intent1 = Intent(this@MainActivity, whether_to_login::class.java)
+                val intent1 = Intent(this@MainActivity, login::class.java)
                 startActivity(intent1)
                 finish()
             }
