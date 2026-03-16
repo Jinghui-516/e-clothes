@@ -12,12 +12,13 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+
+import com.bumptech.glide.Glide
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
-import com.squareup.picasso.Picasso
 import tw.edu.pu.csim.s1102294.e_clothes.Community.Friends
 import tw.edu.pu.csim.s1102294.e_clothes.Community.Liked_Post
 import tw.edu.pu.csim.s1102294.e_clothes.Community.Personal_Page
@@ -76,13 +77,12 @@ class edit_Profile : AppCompatActivity() {
 
                         // Load the profile image into the circular ImageView using Picasso
                         if (!profileImageUrl.isNullOrEmpty()) {
-                            Picasso.get()
+                            Glide.with(this)
                                 .load(profileImageUrl)
-                                .placeholder(R.drawable.ic_launcher_foreground) // 可選的佔位符
-                                .error(R.drawable.user) // 加載失敗時顯示的圖片
+                                .placeholder(R.drawable.ic_launcher_foreground)
+                                .error(R.drawable.user)
                                 .into(circularImageView)
                         } else {
-                            // URL 為空時設置預設圖片
                             circularImageView.setImageResource(R.drawable.user)
                         }
                     }

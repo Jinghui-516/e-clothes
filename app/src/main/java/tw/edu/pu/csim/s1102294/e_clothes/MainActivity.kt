@@ -4,10 +4,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
-import coil.decode.GifDecoder
-import coil.load
-import java.util.*
-import com.bumptech.glide.Glide
+import java.util.*                // 保留
+import com.bumptech.glide.Glide    // 保留，因為你正在使用 Glide
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,11 +13,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val imageView: ImageView = findViewById(R.id.imageView)
-//        imageView.load("file:///android_asset/animate_logo_gif.gif")
+
+        // 這裡你已經正確使用了 Glide，所以不需要 Coil
         Glide.with(this)
-            .asGif() // 確保告訴 Glide 您要加載的是 GIF
-            .load(R.drawable.animate_logo_gif) // 替換為您的 GIF 資源名稱
+            .asGif()
+            .load(R.drawable.animate_logo_gif)
             .into(imageView)
+
         val timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {
@@ -27,6 +27,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent1)
                 finish()
             }
-        }, 3000L) //3秒後跳轉頁面
+        }, 3000L)
     }
 }

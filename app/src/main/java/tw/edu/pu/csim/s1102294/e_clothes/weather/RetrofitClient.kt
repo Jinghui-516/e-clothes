@@ -2,22 +2,22 @@ package tw.edu.pu.csim.s1102294.e_clothes.weather
 
 import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
+// 1. 刪除這行錯誤的 import
+// import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
-object RetrofitClient : WeatherService {
-    fun myWeatherApi(): Retrofit {
-        return Retrofit.Builder()
+object RetrofitClient {
+    // 2. 移除 ": WeatherService" (除非你想手動實作它)
+
+    private val retrofit: Retrofit by lazy {
+        Retrofit.Builder()
             .baseUrl("https://opendata.cwa.gov.tw/api/v1/rest/datastore/")
             .addConverterFactory(GsonConverterFactory.create())
-            .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+            // 3. 刪除這行 addCallAdapterFactory
             .build()
     }
 
-    override fun getWeatherApi(
-        authorization: String,
-        lacation: String
-    ): Call<WeatherResponse> {
-        TODO("Not yet implemented")
+    val service: WeatherService by lazy {
+        retrofit.create(WeatherService::class.java)
     }
 }

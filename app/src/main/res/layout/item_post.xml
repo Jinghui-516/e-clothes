@@ -25,7 +25,7 @@
                 android:layout_height="40dp"
                 android:src="@drawable/user"
                 app:shapeAppearanceOverlay="@style/CircularImageView"
-                app:strokeColor="@color/divider_line"
+                app:strokeColor="#F0F0F0"
                 app:strokeWidth="1dp" />
 
             <TextView
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:text="載入中..."
-                android:textColor="@color/text_primary"
+                android:textColor="#333333"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -56,6 +56,50 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical">
+
+            <ImageButton
+                android:id="@+id/btn_post_like"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_hanger"
+                app:tint="#745E4D" />
+
+            <TextView
+                android:id="@+id/tv_post_likes_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="0"
+                android:textColor="#745E4D"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btn_post_comment"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_comment"
+                app:tint="#745E4D" />
+
+            <TextView
+                android:id="@+id/tv_post_comments_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="0"
+                android:textColor="#745E4D"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="12dp">
 
@@ -64,7 +108,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0 個讚"
-                android:textColor="@color/brand_primary"
+                android:textColor="#745E4D"
                 android:textStyle="bold" />
 
             <TextView
@@ -73,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="貼文內容載入中..."
-                android:textColor="@color/text_primary" />
+                android:textColor="#333333" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

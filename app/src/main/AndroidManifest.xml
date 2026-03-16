@@ -42,6 +42,8 @@
         <activity
             android:name=".clothes.Wardrobe"
             android:exported="false" />
+        <activity android:name=".clothes.Chat_AI"
+            android:exported="false" />
         <activity
             android:name=".clothes.choose_add"
             android:exported="false" />

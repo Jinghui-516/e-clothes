@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
@@ -21,11 +22,14 @@ import tw.edu.pu.csim.s1102294.e_clothes.Match.Rank
 import tw.edu.pu.csim.s1102294.e_clothes.R
 import tw.edu.pu.csim.s1102294.e_clothes.Setting
 import tw.edu.pu.csim.s1102294.e_clothes.home
-import kotlin.jvm.java
 
 class Wardrobe : AppCompatActivity() {
 
     lateinit var bottomNavigationView: BottomNavigationView
+
+    // 🌟 宣告兩個漂浮按鈕：新增與 AI
+    private lateinit var fabAddClothes: FloatingActionButton
+    private lateinit var fabAiRobot: FloatingActionButton
 
     lateinit var hatImagesContainer: LinearLayout
     private val hatImageViews = mutableListOf<ImageView>()
@@ -38,17 +42,25 @@ class Wardrobe : AppCompatActivity() {
     lateinit var shoesImagesContainer: LinearLayout
     private val shoesImageViews = mutableListOf<ImageView>()
 
-    lateinit var hat_layout: LinearLayout
-    lateinit var dress_layout: LinearLayout
-    lateinit var clothes_loayout: LinearLayout
-    lateinit var pants_layout: LinearLayout
-    lateinit var shoes_layout: LinearLayout
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wardrobe)
 
-        // 🌟 導航列設定
+        // 🌟 1. 初始化「新增衣服」加號按鈕並跳轉至 choose_add
+        fabAddClothes = findViewById(R.id.fab_add_clothes)
+        fabAddClothes.setOnClickListener {
+            val intent = Intent(this, choose_add::class.java)
+            startActivity(intent)
+        }
+
+        // 🌟 2. 初始化「AI 機器人」按鈕並跳轉至 Chat_AI
+        fabAiRobot = findViewById(R.id.fab_ai_robot)
+        fabAiRobot.setOnClickListener {
+            val intent = Intent(this, Chat_AI::class.java)
+            startActivity(intent)
+        }
+
+        // 導航列設定
         bottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.selectedItemId = R.id.nav_wardrobe
         bottomNavigationView.setOnItemSelectedListener { item ->
@@ -67,11 +79,10 @@ class Wardrobe : AppCompatActivity() {
                     true
                 }
                 R.id.nav_rank -> {
-                    // 🌟 這裡就是接通跳轉的地方！
                     val intent = Intent(this, Rank::class.java)
                     startActivity(intent)
-                    overridePendingTransition(0, 0) // 讓切換更順滑，沒有跳動感
-                    finish() // 關閉目前這一頁
+                    overridePendingTransition(0, 0)
+                    finish()
                     true
                 }
                 R.id.nav_profile -> {
@@ -84,7 +95,7 @@ class Wardrobe : AppCompatActivity() {
             }
         }
 
-        // 分類點擊跳轉 (保留你原本功能)
+        // 🌟 原本的分頁點擊跳轉 (如果 choose_add 寫好了，以後可以考慮統一跳轉至 choose_add)
         findViewById<LinearLayout>(R.id.hat_layout).setOnClickListener {
             startActivity(Intent(this, add_hat::class.java))
         }
@@ -101,7 +112,7 @@ class Wardrobe : AppCompatActivity() {
             startActivity(Intent(this, add_shoes::class.java))
         }
 
-        // 容器綁定與初始化 (延用你原本邏輯)
+        // 容器綁定與初始化
         hatImagesContainer = findViewById(R.id.imagesContainer)
         dressImagesContainer = findViewById(R.id.dressimagesContainer)
         clothesImagesContainer = findViewById(R.id.clothesimagesContainer)
@@ -114,6 +125,7 @@ class Wardrobe : AppCompatActivity() {
         initializeImageViews(pantsImagesContainer, pantsImageViews)
         initializeImageViews(shoesImagesContainer, shoesImageViews)
 
+        // 撈取各分類圖片
         downloadImages("頭飾", hatImageViews)
         downloadImages("洋裝", dressImageViews)
         downloadImages("上衣", clothesImageViews)
@@ -128,10 +140,10 @@ class Wardrobe : AppCompatActivity() {
                 (100 * resources.displayMetrics.density).toInt(),
                 (100 * resources.displayMetrics.density).toInt()
             )
-            layoutParams.setMargins(0, 0, 16, 0) // 增加圖片間距
+            layoutParams.setMargins(0, 0, 16, 0)
             imageView.layoutParams = layoutParams
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-            imageView.setBackgroundResource(R.drawable.corners_login) // 使用你之前的圓角資源
+            imageView.setBackgroundResource(R.drawable.corners_login)
             imageView.clipToOutline = true
             container.addView(imageView)
             imageViews.add(imageView)
@@ -162,16 +174,31 @@ class Wardrobe : AppCompatActivity() {
                             }
                         }
                     }
+                    .addOnFailureListener { e ->
+                        Log.e("Wardrobe", "下載 $type 失敗: ${e.message}")
+                    }
             }
         }
     }
 
-    private fun downloadFromFirebaseStorage(relativePath: String, imageView: ImageView) {
+    private fun downloadFromFirebaseStorage(path: String, imageView: ImageView) {
         val storage = FirebaseStorage.getInstance()
-        val storageRef = storage.reference.child(relativePath)
+
+        // 🌟 這裡加上一個防呆判斷，確保路徑不為空
+        if (path.isEmpty()) return
+
+        // 判斷路徑是完整 URL 還是 Storage 相對路徑
+        val storageRef = if (path.startsWith("http")) {
+            storage.getReferenceFromUrl(path)
+        } else {
+            storage.reference.child(path)
+        }
+
         storageRef.getBytes(Long.MAX_VALUE).addOnSuccessListener { bytes ->
             val bmp: Bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
             imageView.setImageBitmap(bmp)
+        }.addOnFailureListener {
+            Log.e("Wardrobe", "Storage 下載失敗: ${it.message}")
         }
     }
 }

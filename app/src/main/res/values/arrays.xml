@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="category_array">
+        <item>請選擇種類</item>
+        <item>上衣</item>
+        <item>褲子</item>
+        <item>裙子</item>
+        <item>洋裝</item>
+        <item>外套</item>
+        <item>鞋子</item>
+        <item>頭飾</item>
+    </string-array>
+
+    <string-array name="color_array">
+        <item>請選擇顏色</item>
+        <item>黑色</item>
+        <item>白色</item>
+        <item>灰色</item>
+        <item>紅色</item>
+        <item>藍色</item>
+        <item>黃色</item>
+        <item>綠色</item>
+        <item>奶茶色</item>
+        <item>粉色</item>
+        <item>橘色</item>
+        <item>紫色</item>
+        <item>大地色系</item>
+        <item>多色/圖騰</item>
+    </string-array>
+</resources>

@@ -75,6 +75,9 @@ class Match_home : AppCompatActivity() {
                 for (doc in value!!) {
                     // 將資料庫文件轉換成 Post 物件
                     val post = doc.toObject(Post::class.java)
+                    // 🌟 關鍵修改：把資料庫的文件 ID 取出來，塞給這則貼文！
+                    // 這樣 PostAdapter 裡的按讚邏輯才知道要更新哪一筆資料
+                    post.postId = doc.id
                     posts.add(post)
                 }
 

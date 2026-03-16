@@ -1,159 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#EBE6E2"
+    android:background="#FFFFFF"
     tools:context=".clothes.choose_add">
 
     <LinearLayout
+        android:id="@+id/header_layout"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:orientation="horizontal">
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
 
         <ImageView
             android:id="@+id/imageView2"
-            android:layout_width="200dp"
-            android:layout_height="60dp"
-            app:srcCompat="@drawable/logo_login" />
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:src="@drawable/logo_login"
+            android:scaleType="fitStart" />
 
-        <TextView
-            android:id="@+id/textView15"
-            android:layout_width="200dp"
+        <Space
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-    </LinearLayout>
+        <ImageView
+            android:id="@+id/menu_icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/menu"
+            app:tint="#745E4D" /> </LinearLayout>
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/header_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#AAA09E" />
+        android:layout_below="@id/header_layout"
+        android:background="#F0F0F0" /> <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@id/header_divider"
+    android:layout_above="@id/bottom_navigation">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="32dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"></LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:text="新增您的衣物"
+            android:textColor="#745E4D" android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
 
-            <ImageView
-                android:id="@+id/camera"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/camera" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="請先選擇分類，再新增照片唷！"
+            android:textColor="#AAA09E"
+            android:textSize="14sp"
+            android:layout_marginBottom="32dp"/>
 
-            <Button
-                android:id="@+id/camera_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/corners_login"
-                android:text="開啟相機" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1. 服裝種類"
+            android:textColor="#745E4D" android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
 
-            <ImageView
-                android:id="@+id/photo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginTop="20dp"
-                app:srcCompat="@drawable/gallery" />
-
-            <Button
-                android:id="@+id/photo_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/corners_login"
-                android:text="開啟相簿" />
-
-            <ImageView
-                android:id="@+id/cabinet"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginTop="20dp"
-                app:srcCompat="@drawable/cupboard" />
-
-            <Button
-                android:id="@+id/cabinet_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/corners_login"
-                android:text="我的衣櫃" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"></LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#AAA09E"
-            android:orientation="vertical"></LinearLayout>
-
-        <LinearLayout
+        <Spinner
+            android:id="@+id/spinner_category"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:background="@drawable/corners_login"
+            android:backgroundTint="#F5F5F5"
+            android:entries="@array/category_array"
+            android:layout_marginBottom="24dp"/>
 
-            <ImageView
-                android:id="@+id/Home"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/home" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2. 主要顏色"
+            android:textColor="#745E4D" android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
 
-            <ImageView
-                android:id="@+id/Match"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/pencil" />
+        <Spinner
+            android:id="@+id/spinner_color"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/corners_login"
+            android:backgroundTint="#F5F5F5"
+            android:entries="@array/color_array"
+            android:layout_marginBottom="40dp"/>
 
-            <ImageView
-                android:id="@+id/Clothes"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/plus" />
+        <Button
+            android:id="@+id/camera_btn"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:backgroundTint="#745E4D"
+            android:text="📷 拍攝衣物照片"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="16dp"/>
 
-            <ImageView
-                android:id="@+id/Friend"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/users" />
-
-            <ImageView
-                android:id="@+id/set"
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                app:srcCompat="@drawable/settings" />
-
-
-        </LinearLayout>
+        <Button
+            android:id="@+id/photo_btn"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:backgroundTint="#745E4D"
+            android:text="🖼️ 從相簿中挑選"
+            android:textColor="#FFFFFF" />
 
     </LinearLayout>
+</ScrollView>
 
-</LinearLayout>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF"
+        app:itemIconTint="#745E4D"
+        app:itemIconSize="28dp"
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/bottom_nav_menu"
+        app:elevation="8dp" />
+
+</RelativeLayout>

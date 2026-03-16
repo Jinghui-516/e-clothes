@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import tw.edu.pu.csim.s1102294.e_clothes.Match.Match_home
 import tw.edu.pu.csim.s1102294.e_clothes.R
 import tw.edu.pu.csim.s1102294.e_clothes.Setting
@@ -90,10 +90,14 @@ class Friend_Invite : AppCompatActivity() {
 
                                 // 加載頭像圖片 (檢查 URL 是否為空)
                                 if (!senderProfileImageUrl.isNullOrEmpty()) {
-                                    Picasso.get()
+                                    // 原本 Picasso 的寫法：
+// Picasso.get().load(senderProfileImageUrl)...
+
+// 改為 Glide 的寫法：
+                                    Glide.with(itemView.context)
                                         .load(senderProfileImageUrl)
-                                        .placeholder(R.drawable.ic_launcher_foreground) // 可選的占位符
-                                        .error(R.drawable.user) // 頭像加載錯誤時顯示的預設圖片
+                                        .placeholder(R.drawable.ic_launcher_foreground)
+                                        .error(R.drawable.user)
                                         .into(friendImage)
                                 } else {
                                     // 如果 URL 為空，顯示預設圖片

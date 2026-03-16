@@ -17,6 +17,14 @@
         <item name="android:textColor">#67595E</item> <!-- 修改文字顏色 -->
     </style>
 
-
+    <style name="TagButtonStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">38dp</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:backgroundTint">#745E4D</item> <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">20dp</item>
+    </style>
 
 </resources>

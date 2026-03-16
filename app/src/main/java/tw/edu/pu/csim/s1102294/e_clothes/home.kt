@@ -238,8 +238,8 @@ class home : AppCompatActivity() {
         tomorrow_night_weather = findViewById(R.id.tomorrow_night_weather)
         tomorrow_night_temperature = findViewById(R.id.tomorrow_night_temperature)
 
-        weatherService = RetrofitClient.myWeatherApi().create(WeatherService::class.java)
-
+        // 將 home.kt 第 241 行改為：
+        weatherService = RetrofitClient.service
         matchRecyclerView = findViewById(R.id.match_recycler_view)
         matchRecyclerView.layoutManager = LinearLayoutManager(this)
 

@@ -5,131 +5,135 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#EBE6E2"
+    android:background="#FFFFFF"
     tools:context=".Community.Friend_Invite">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:orientation="horizontal">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp">
 
         <ImageView
             android:id="@+id/imageView2"
-            android:layout_width="200dp"
-            android:layout_height="60dp"
+            android:layout_width="120dp"
+            android:layout_height="40dp"
+            android:scaleType="fitStart"
             app:srcCompat="@drawable/logo_login" />
 
-        <TextView
-            android:id="@+id/textView15"
-            android:layout_width="200dp"
+        <Space
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
         <ImageView
             android:id="@+id/menu_friend"
-            android:layout_width="50dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            app:srcCompat="@drawable/menu" />
-
-
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            app:srcCompat="@drawable/menu"
+            app:tint="#745E4D" />
     </LinearLayout>
 
-    <LinearLayout
+    <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#AAA09E"
-        android:orientation="vertical"></LinearLayout>
+        android:background="#F0F0F0" />
 
-    <TextView
-        android:id="@+id/textView11"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="好友邀請"
-        android:textColor="@color/black"
-        android:textSize="20dp" />
+        android:orientation="vertical"
+        android:padding="20dp">
 
-    <TextView
-        android:id="@+id/textView13"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:text="看看有誰想當你的朋友呀?"
-        android:textColor="@color/black"
-        android:layout_marginBottom="50dp"
-        android:textSize="15dp" />
+        <TextView
+            android:id="@+id/textView11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="好友邀請"
+            android:textColor="#745E4D"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView13"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="看看有誰想當你的朋友呀？"
+            android:textColor="#AAA09E"
+            android:textSize="14sp" />
+    </LinearLayout>
 
     <View
-        android:id="@+id/view1"
+        android:id="@+id/view_divider_top"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#AAA09E" />
+        android:background="#F5F5F5" />
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
-    </LinearLayout>
-
-
-
+    </FrameLayout>
 
     <View
-        android:id="@+id/view1"
+        android:id="@+id/view_divider_bottom"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#AAA09E" />
+        android:background="#F5F5F5" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="60dp"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="#FFFFFF">
+
         <ImageView
             android:id="@+id/Home"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/home" />
+            app:srcCompat="@drawable/home"
+            app:tint="#745E4D" />
 
         <ImageView
             android:id="@+id/Match"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/pencil" />
+            app:srcCompat="@drawable/pencil"
+            app:tint="#745E4D" />
 
         <ImageView
             android:id="@+id/Clothes"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/plus" />
+            app:srcCompat="@drawable/plus"
+            app:tint="#745E4D" />
 
         <ImageView
             android:id="@+id/Friend"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/users" />
+            app:srcCompat="@drawable/users"
+            app:tint="#745E4D" />
 
         <ImageView
             android:id="@+id/set"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/settings" />
-
+            app:srcCompat="@drawable/settings"
+            app:tint="#745E4D" />
     </LinearLayout>
-
-
 
 </LinearLayout>

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "167859099815",
-    "project_id": "e-clothes-ab3cc",
-    "storage_bucket": "e-clothes-ab3cc.appspot.com"
+    "project_number": "841913028405",
+    "project_id": "e-fit-346da",
+    "storage_bucket": "e-fit-346da.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:167859099815:android:1607faf6a5d7ab86266382",
+        "mobilesdk_app_id": "1:841913028405:android:c02f5eead4fea6c4e2467c",
         "android_client_info": {
           "package_name": "tw.edu.pu.csim.s1102294.e_clothes"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAGadAsxhPOz7wET5pjwtJHU8KUFMXZOlY"
+          "current_key": "AIzaSyBXTcTJgSuV5WK-M4kDIeyBFTTeIO1uxjY"
         }
       ],
       "services": {

@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.squareup.picasso.Picasso
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -161,7 +161,9 @@ class Edit_Label : AppCompatActivity(), GestureDetector.OnGestureListener {
                 val imageUri = Uri.parse(imageUriString)
                 imageUrls.add(imageUriString)  // Add the new image URL to the list
                 currentImageIndex = imageUrls.size - 1  // Update to point to the new image
-                Picasso.get().load(imageUri).into(imgDisplay) // Use Picasso to load the image from URI
+                // 原本：Picasso.get().load(imageUri).into(imgDisplay)
+                Glide.with(this).load(imageUri).into(imgDisplay)
+
             }
             imageBitmap != null -> {
                 // Convert the Bitmap to a file URI if necessary, and add it to the imageUrls
@@ -313,7 +315,12 @@ class Edit_Label : AppCompatActivity(), GestureDetector.OnGestureListener {
         } else {
             "https://www.example.com/default_image.jpg"  // 用你自己預設的圖片 URL
         }
-        Picasso.get().load(imageUrlToLoad).error(R.drawable.m).into(imgDisplay)
+        // 原本：Picasso.get().load(imageUrlToLoad).error(R.drawable.m).into(imgDisplay)
+        Glide.with(this)
+            .load(imageUrlToLoad)
+            .error(R.drawable.m)
+            .into(imgDisplay)
+
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
