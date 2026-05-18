@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Community
+package tw.edu.pu.csim.s1120336.e_fit.Community
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -17,13 +17,13 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.bumptech.glide.Glide
-import tw.edu.pu.csim.s1102294.e_clothes.Match.Match_home
-import tw.edu.pu.csim.s1102294.e_clothes.Match.New_Match
-import tw.edu.pu.csim.s1102294.e_clothes.Match.share_Match
-import tw.edu.pu.csim.s1102294.e_clothes.R
-import tw.edu.pu.csim.s1102294.e_clothes.Setting
-import tw.edu.pu.csim.s1102294.e_clothes.clothes.choose_add
-import tw.edu.pu.csim.s1102294.e_clothes.home
+import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
+import tw.edu.pu.csim.s1120336.e_fit.Match.New_Match
+import tw.edu.pu.csim.s1120336.e_fit.Match.share_Match
+import tw.edu.pu.csim.s1120336.e_fit.R
+import tw.edu.pu.csim.s1120336.e_fit.Setting
+import tw.edu.pu.csim.s1120336.e_fit.clothes.choose_add
+import tw.edu.pu.csim.s1120336.e_fit.home
 
 class Friends : AppCompatActivity() {
 

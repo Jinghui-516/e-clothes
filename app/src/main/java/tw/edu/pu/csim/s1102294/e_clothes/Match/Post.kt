@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Match
+package tw.edu.pu.csim.s1120336.e_fit.Match
 
 // 這是一則貼文的「藍圖」，規定了每一則貼文必須包含哪些資料
 data class Post(

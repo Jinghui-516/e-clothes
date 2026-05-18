@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.clothes
+package tw.edu.pu.csim.s1120336.e_fit.clothes  // 🌟 1. 修改為妳的新學號與 e_fit 專案路徑
 
 import android.content.Context
 import android.content.Intent
@@ -17,21 +17,22 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import tw.edu.pu.csim.s1102294.e_clothes.R
-import tw.edu.pu.csim.s1102294.e_clothes.home
+import tw.edu.pu.csim.s1120336.e_fit.clothes.FirebaseHelper
+import tw.edu.pu.csim.s1120336.e_fit.home
+
+  // 🌟 2. 修改首頁跳轉的 import 路徑
+import tw.edu.pu.csim.s1120336.e_fit.R     // 🌟 3. 修正 R 檔引用！刪除原本錯誤的 firebase.auth.R
 import java.io.File
 import java.io.FileOutputStream
-import java.io.IOException
 import java.util.*
 
 class New_clothes : AppCompatActivity() {
 
-    // --- 內部類別與變數保持不變 ---
+    // --- 內部類別與變數 ---
     class LabelAdapter(private val labels: MutableList<String>, private val onLabelLongPress: (Int) -> Unit) : RecyclerView.Adapter<LabelAdapter.LabelViewHolder>() {
         class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            // 🌟 這裡會自動對應到妳新專案對應的 item_label.xml 內的文字 ID
             val textView: TextView = itemView.findViewById(R.id.textView)
         }
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LabelViewHolder {
@@ -83,7 +84,7 @@ class New_clothes : AppCompatActivity() {
         val bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNav.selectedItemId = R.id.nav_wardrobe
         bottomNav.setOnItemSelectedListener { item ->
-            // 這裡可以複製 Wardrobe.kt 的導覽列跳轉邏輯
+            // 這裡可以複製妳專案中導覽列跳轉邏輯
             true
         }
 
@@ -135,7 +136,7 @@ class New_clothes : AppCompatActivity() {
 
         val data = hashMapOf(
             "服裝種類" to category,
-            "顏色" to selectedColor, // 🌟 存入顏色
+            "顏色" to selectedColor,
             "圖片網址" to imageUrl,
             "圖片完整網址" to fullUrl,
             "標籤" to labelTexts,
@@ -146,14 +147,21 @@ class New_clothes : AppCompatActivity() {
             Toast.makeText(this, "新增完成！", Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, home::class.java))
             finish()
+        }.addOnFailureListener { e ->
+            Log.e("FirestoreError", "存入失敗", e)
+            Toast.makeText(this, "資料存入失敗: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // --- 輔助方法：getImageUriFromBitmap 與 showDeleteDialog 保持不變 ---
+    // --- 輔助方法 ---
     private fun getImageUriFromBitmap(context: Context, bitmap: Bitmap): Uri? {
         val file = File(context.cacheDir, "${UUID.randomUUID()}.jpg")
         return try {
-            val os = FileOutputStream(file); bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os); os.flush(); os.close(); Uri.fromFile(file)
+            val os = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os)
+            os.flush()
+            os.close()
+            Uri.fromFile(file)
         } catch (e: Exception) { null }
     }
 

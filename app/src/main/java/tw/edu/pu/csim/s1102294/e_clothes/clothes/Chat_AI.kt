@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.clothes
+package tw.edu.pu.csim.s1120336.e_fit.clothes
 
 import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
@@ -15,7 +15,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.launch
-import tw.edu.pu.csim.s1102294.e_clothes.R
+import tw.edu.pu.csim.s1120336.e_fit.R
 
 class Chat_AI : AppCompatActivity() {
 

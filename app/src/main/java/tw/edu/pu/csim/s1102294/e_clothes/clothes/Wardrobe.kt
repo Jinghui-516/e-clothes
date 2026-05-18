@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.clothes
+package tw.edu.pu.csim.s1120336.e_fit.clothes
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -15,13 +15,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Friends
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Personal_Page
-import tw.edu.pu.csim.s1102294.e_clothes.Match.Match_home
-import tw.edu.pu.csim.s1102294.e_clothes.Match.Rank
-import tw.edu.pu.csim.s1102294.e_clothes.R
-import tw.edu.pu.csim.s1102294.e_clothes.Setting
-import tw.edu.pu.csim.s1102294.e_clothes.home
+import tw.edu.pu.csim.s1120336.e_fit.Community.Friends
+import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
+import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
+import tw.edu.pu.csim.s1120336.e_fit.Match.Rank
+import tw.edu.pu.csim.s1120336.e_fit.R
+import tw.edu.pu.csim.s1120336.e_fit.Setting
+import tw.edu.pu.csim.s1120336.e_fit.home
 
 class Wardrobe : AppCompatActivity() {
 

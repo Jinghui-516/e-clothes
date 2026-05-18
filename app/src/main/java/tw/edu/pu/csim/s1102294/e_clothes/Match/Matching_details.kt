@@ -1,20 +1,20 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Match
+package tw.edu.pu.csim.s1120336.e_fit.Match
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import tw.edu.pu.csim.s1102294.e_clothes.R
+import tw.edu.pu.csim.s1120336.e_fit.R
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.DocumentSnapshot
 import android.widget.TextView
 import android.widget.ImageView
 import com.bumptech.glide.Glide // Or your preferred image loading library
 import com.google.firebase.auth.FirebaseAuth
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Friends
-import tw.edu.pu.csim.s1102294.e_clothes.Setting
-import tw.edu.pu.csim.s1102294.e_clothes.clothes.choose_add
-import tw.edu.pu.csim.s1102294.e_clothes.home
+import tw.edu.pu.csim.s1120336.e_fit.Community.Friends
+import tw.edu.pu.csim.s1120336.e_fit.Setting
+import tw.edu.pu.csim.s1120336.e_fit.clothes.choose_add
+import tw.edu.pu.csim.s1120336.e_fit.home
 
 class Matching_details : AppCompatActivity() {
 

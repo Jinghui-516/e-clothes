@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes
+package tw.edu.pu.csim.s1120336.e_fit
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +10,7 @@ import android.widget.EditText
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import java.util.*
-
+import tw.edu.pu.csim.s1120336.e_fit.R
 class forget_password : AppCompatActivity() {
 
     lateinit var email: EditText

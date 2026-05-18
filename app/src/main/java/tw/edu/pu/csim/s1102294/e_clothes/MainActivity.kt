@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes
+package tw.edu.pu.csim.s1120336.e_fit
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.widget.ImageView
 import java.util.*                // 保留
 import com.bumptech.glide.Glide    // 保留，因為你正在使用 Glide
-
+import tw.edu.pu.csim.s1120336.e_fit.R
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

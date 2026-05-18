@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Match
+package tw.edu.pu.csim.s1120336.e_fit.Match
 
 import android.content.Intent
 import android.content.res.Resources
@@ -14,7 +14,7 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import tw.edu.pu.csim.s1102294.e_clothes.R
+import tw.edu.pu.csim.s1120336.e_fit.R
 import java.util.*
 
 class New_Match : AppCompatActivity(), GestureDetector.OnGestureListener {

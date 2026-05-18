@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes
+package tw.edu.pu.csim.s1120336.e_fit
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -9,7 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import java.util.*
-
+import tw.edu.pu.csim.s1120336.e_fit.R
 class login : AppCompatActivity() {
 
     lateinit var btn_login: Button

@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes
+package tw.edu.pu.csim.s1120336.e_fit
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -13,12 +13,12 @@ import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseUser
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Liked_Post
-//import tw.edu.pu.csim.s1102294.e_clothes.Community.Liked_Post
-import tw.edu.pu.csim.s1102294.e_clothes.Match.edit_Chosen_Match
-import tw.edu.pu.csim.s1102294.e_clothes.Match.edit_Profile
-import tw.edu.pu.csim.s1102294.e_clothes.Match.share_Match
-
+import tw.edu.pu.csim.s1120336.e_fit.Community.Liked_Post
+//import tw.edu.pu.csim.s1120336.e_fit.Community.Liked_Post
+import tw.edu.pu.csim.s1120336.e_fit.Match.edit_Chosen_Match
+import tw.edu.pu.csim.s1120336.e_fit.Match.edit_Profile
+import tw.edu.pu.csim.s1120336.e_fit.Match.share_Match
+import tw.edu.pu.csim.s1120336.e_fit.R
 class Setting : AppCompatActivity() {
 
     lateinit var btn_Delete: Button

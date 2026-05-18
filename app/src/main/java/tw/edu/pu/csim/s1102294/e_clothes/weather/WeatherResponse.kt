@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.weather
+package tw.edu.pu.csim.s1120336.e_fit.weather
 
 data class WeatherResponse(
     val records: Records

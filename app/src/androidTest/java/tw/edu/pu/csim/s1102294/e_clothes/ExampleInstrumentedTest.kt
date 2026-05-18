@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes
+package tw.edu.pu.csim.s1120336.e_fit
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("tw.edu.pu.csim.s1102294.e_clothes", appContext.packageName)
+        assertEquals("tw.edu.pu.csim.s1120336.e_fit", appContext.packageName)
     }
 }

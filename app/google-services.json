@@ -9,7 +9,26 @@
       "client_info": {
         "mobilesdk_app_id": "1:841913028405:android:c02f5eead4fea6c4e2467c",
         "android_client_info": {
-          "package_name": "tw.edu.pu.csim.s1102294.e_clothes"
+          "package_name": "tw.edu.pu.csim.s1120336.e_fit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXTcTJgSuV5WK-M4kDIeyBFTTeIO1uxjY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:841913028405:android:372b7c371e026980e2467c",
+        "android_client_info": {
+          "package_name": "tw.edu.pu.csim.s1120336.e_fit"
         }
       },
       "oauth_client": [],

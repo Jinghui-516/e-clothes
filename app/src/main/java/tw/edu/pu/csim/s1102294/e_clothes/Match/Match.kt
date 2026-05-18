@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Match
+package tw.edu.pu.csim.s1120336.e_fit.Match
 
 import com.google.firebase.firestore.PropertyName
 import java.io.Serializable

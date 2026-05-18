@@ -1,11 +1,11 @@
-package tw.edu.pu.csim.s1102294.e_clothes.clothes
+package tw.edu.pu.csim.s1120336.e_fit.clothes
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import tw.edu.pu.csim.s1102294.e_clothes.R
+import tw.edu.pu.csim.s1120336.e_fit.R
 
 class ChatAdapter(private val chatList: List<ChatMessage>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

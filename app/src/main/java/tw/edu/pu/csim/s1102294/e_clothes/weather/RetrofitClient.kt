@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.weather
+package tw.edu.pu.csim.s1120336.e_fit.weather
 
 import retrofit2.Call
 import retrofit2.Retrofit

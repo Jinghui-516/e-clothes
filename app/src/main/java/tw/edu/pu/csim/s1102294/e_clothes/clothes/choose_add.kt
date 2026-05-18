@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.clothes
+package tw.edu.pu.csim.s1120336.e_fit.clothes
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -12,12 +12,13 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Friends
-import tw.edu.pu.csim.s1102294.e_clothes.Match.Match_home
-import tw.edu.pu.csim.s1102294.e_clothes.Match.Rank
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Personal_Page
-import tw.edu.pu.csim.s1102294.e_clothes.R
-import tw.edu.pu.csim.s1102294.e_clothes.home
+import tw.edu.pu.csim.s1120336.e_fit.Community.Friends
+import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
+import tw.edu.pu.csim.s1120336.e_fit.Match.Rank
+import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
+import tw.edu.pu.csim.s1120336.e_fit.R
+import tw.edu.pu.csim.s1120336.e_fit.home
+import tw.edu.pu.csim.s1120336.e_fit.clothes.New_clothes
 
 
 class choose_add : AppCompatActivity() {

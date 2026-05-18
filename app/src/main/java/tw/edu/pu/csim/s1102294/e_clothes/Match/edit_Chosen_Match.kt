@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Match
+package tw.edu.pu.csim.s1120336.e_fit.Match
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -10,10 +10,10 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import org.w3c.dom.Text
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Liked_Post
-import tw.edu.pu.csim.s1102294.e_clothes.R
-import tw.edu.pu.csim.s1102294.e_clothes.Setting
-import tw.edu.pu.csim.s1102294.e_clothes.home
+import tw.edu.pu.csim.s1120336.e_fit.Community.Liked_Post
+import tw.edu.pu.csim.s1120336.e_fit.R
+import tw.edu.pu.csim.s1120336.e_fit.Setting
+import tw.edu.pu.csim.s1120336.e_fit.home
 
 class edit_Chosen_Match : AppCompatActivity(), GestureDetector.OnGestureListener {
 

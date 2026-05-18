@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Match
+package tw.edu.pu.csim.s1120336.e_fit.Match
 
 import android.content.Intent
 import android.net.Uri
@@ -19,14 +19,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Friends
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Liked_Post
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Personal_Page
-import tw.edu.pu.csim.s1102294.e_clothes.R
-import tw.edu.pu.csim.s1102294.e_clothes.Setting
-import tw.edu.pu.csim.s1102294.e_clothes.change_password
-import tw.edu.pu.csim.s1102294.e_clothes.clothes.choose_add
-import tw.edu.pu.csim.s1102294.e_clothes.home
+import tw.edu.pu.csim.s1120336.e_fit.Community.Friends
+import tw.edu.pu.csim.s1120336.e_fit.Community.Liked_Post
+import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
+import tw.edu.pu.csim.s1120336.e_fit.R
+import tw.edu.pu.csim.s1120336.e_fit.Setting
+import tw.edu.pu.csim.s1120336.e_fit.change_password
+import tw.edu.pu.csim.s1120336.e_fit.clothes.choose_add
+import tw.edu.pu.csim.s1120336.e_fit.home
 
 class edit_Profile : AppCompatActivity() {
 

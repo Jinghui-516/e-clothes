@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Community
+package tw.edu.pu.csim.s1120336.e_fit.Community
 
 data class FriendRequest(
     val sender: String = "",

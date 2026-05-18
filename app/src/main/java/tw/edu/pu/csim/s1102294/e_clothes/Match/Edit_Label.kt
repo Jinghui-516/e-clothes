@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Match
+package tw.edu.pu.csim.s1120336.e_fit.Match
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -19,14 +19,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Friends
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Personal_Page
-import tw.edu.pu.csim.s1102294.e_clothes.R
-import tw.edu.pu.csim.s1102294.e_clothes.clothes.FirebaseHelper
-import tw.edu.pu.csim.s1102294.e_clothes.clothes.New_clothes
-import tw.edu.pu.csim.s1102294.e_clothes.clothes.choose_add
-import tw.edu.pu.csim.s1102294.e_clothes.home
-import tw.edu.pu.csim.s1102294.e_clothes.login
+import tw.edu.pu.csim.s1120336.e_fit.Community.Friends
+import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
+import tw.edu.pu.csim.s1120336.e_fit.R
+import tw.edu.pu.csim.s1120336.e_fit.clothes.FirebaseHelper
+import tw.edu.pu.csim.s1120336.e_fit.clothes.New_clothes
+import tw.edu.pu.csim.s1120336.e_fit.clothes.choose_add
+import tw.edu.pu.csim.s1120336.e_fit.home
+import tw.edu.pu.csim.s1120336.e_fit.login
 
 class Edit_Label : AppCompatActivity(), GestureDetector.OnGestureListener {
 

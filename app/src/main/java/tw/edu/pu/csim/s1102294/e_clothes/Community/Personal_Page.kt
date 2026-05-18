@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Community
+package tw.edu.pu.csim.s1120336.e_fit.Community
 
 import android.app.Activity
 import android.content.Intent
@@ -16,11 +16,11 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import tw.edu.pu.csim.s1102294.e_clothes.Match.Match_home
-import tw.edu.pu.csim.s1102294.e_clothes.Match.Rank
-import tw.edu.pu.csim.s1102294.e_clothes.R
-import tw.edu.pu.csim.s1102294.e_clothes.clothes.Wardrobe
-import tw.edu.pu.csim.s1102294.e_clothes.home
+import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
+import tw.edu.pu.csim.s1120336.e_fit.Match.Rank
+import tw.edu.pu.csim.s1120336.e_fit.R
+import tw.edu.pu.csim.s1120336.e_fit.clothes.Wardrobe
+import tw.edu.pu.csim.s1120336.e_fit.home
 import java.util.*
 
 class Personal_Page : AppCompatActivity() {

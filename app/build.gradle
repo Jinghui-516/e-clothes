@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace 'tw.edu.pu.csim.s1102294.e_clothes'
+    namespace 'tw.edu.pu.csim.s1120336.e_fit'
     compileSdk 34 // 建議設為 34 或 35，相容性較好
 
     defaultConfig {
-        applicationId "tw.edu.pu.csim.s1102294.e_clothes"
+        applicationId "tw.edu.pu.csim.s1120336.e_fit"
         minSdk 24
         targetSdk 34
         versionCode 1

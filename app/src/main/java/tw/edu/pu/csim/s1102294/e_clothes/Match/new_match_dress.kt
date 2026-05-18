@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Match
+package tw.edu.pu.csim.s1120336.e_fit.Match
 
 import android.content.Intent
 import android.content.res.Resources
@@ -8,7 +8,7 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.Button
 import android.widget.ImageView
-import tw.edu.pu.csim.s1102294.e_clothes.R
+import tw.edu.pu.csim.s1120336.e_fit.R
 
 class new_match_dress : AppCompatActivity(), GestureDetector.OnGestureListener {
 

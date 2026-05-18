@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes
+package tw.edu.pu.csim.s1120336.e_fit
 
 import android.Manifest
 import android.content.Intent
@@ -27,21 +27,21 @@ import com.google.firebase.firestore.FirebaseFirestore
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Friends
-import tw.edu.pu.csim.s1102294.e_clothes.Community.Personal_Page
-import tw.edu.pu.csim.s1102294.e_clothes.Match.Match
-import tw.edu.pu.csim.s1102294.e_clothes.Match.Match_home
-import tw.edu.pu.csim.s1102294.e_clothes.Match.Matching_details
-import tw.edu.pu.csim.s1102294.e_clothes.Match.Rank
-import tw.edu.pu.csim.s1102294.e_clothes.clothes.choose_add
-import tw.edu.pu.csim.s1102294.e_clothes.weather.RetrofitClient
-import tw.edu.pu.csim.s1102294.e_clothes.weather.WeatherResponse
-import tw.edu.pu.csim.s1102294.e_clothes.weather.WeatherService
-import tw.edu.pu.csim.s1102294.e_clothes.weather.Time
+import tw.edu.pu.csim.s1120336.e_fit.Community.Friends
+import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
+import tw.edu.pu.csim.s1120336.e_fit.Match.Match
+import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
+import tw.edu.pu.csim.s1120336.e_fit.Match.Matching_details
+import tw.edu.pu.csim.s1120336.e_fit.Match.Rank
+import tw.edu.pu.csim.s1120336.e_fit.clothes.choose_add
+import tw.edu.pu.csim.s1120336.e_fit.weather.RetrofitClient
+import tw.edu.pu.csim.s1120336.e_fit.weather.WeatherResponse
+import tw.edu.pu.csim.s1120336.e_fit.weather.WeatherService
+import tw.edu.pu.csim.s1120336.e_fit.weather.Time
 import java.text.SimpleDateFormat
 import java.util.*
-import tw.edu.pu.csim.s1102294.e_clothes.clothes.Wardrobe
-
+import tw.edu.pu.csim.s1120336.e_fit.clothes.Wardrobe
+import tw.edu.pu.csim.s1120336.e_fit.R
 class home : AppCompatActivity() {
 
     // Inner adapter class for match list
@@ -265,7 +265,7 @@ class home : AppCompatActivity() {
                             Log.e("Firestore", "No documents found!")
                         } else {
                             for (document in documents) {
-                                val match = document.toObject(tw.edu.pu.csim.s1102294.e_clothes.Match.Match::class.java)
+                                val match = document.toObject(tw.edu.pu.csim.s1120336.e_fit.Match.Match::class.java)
 
                                 if (match.isValid()) {
                                     Log.d("MatchData", "Match: $match")

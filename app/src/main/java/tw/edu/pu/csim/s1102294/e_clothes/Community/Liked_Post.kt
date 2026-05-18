@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1102294.e_clothes.Community
+package tw.edu.pu.csim.s1120336.e_fit.Community
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -7,11 +7,11 @@ import android.os.Bundle
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.Toast
-import tw.edu.pu.csim.s1102294.e_clothes.Match.edit_Chosen_Match
-import tw.edu.pu.csim.s1102294.e_clothes.Match.edit_Profile
-import tw.edu.pu.csim.s1102294.e_clothes.Match.share_Match
-import tw.edu.pu.csim.s1102294.e_clothes.R
-import tw.edu.pu.csim.s1102294.e_clothes.Setting
+import tw.edu.pu.csim.s1120336.e_fit.Match.edit_Chosen_Match
+import tw.edu.pu.csim.s1120336.e_fit.Match.edit_Profile
+import tw.edu.pu.csim.s1120336.e_fit.Match.share_Match
+import tw.edu.pu.csim.s1120336.e_fit.R
+import tw.edu.pu.csim.s1120336.e_fit.Setting
 
 class Liked_Post : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
