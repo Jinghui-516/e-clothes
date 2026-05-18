@@ -1,83 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/brand_background"
-    tools:context=".clothes.Chat_AI">
+    android:background="#FFFFFF">
 
     <RelativeLayout
-        android:id="@+id/chat_header"
+        android:id="@+id/top_bar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@color/white"
+        android:layout_height="56dp"
+        android:background="#4A3E3D"
         android:paddingHorizontal="16dp">
 
         <ImageButton
             android:id="@+id/btn_chat_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_revert"
-            app:tint="@color/brand_primary" />
+            android:src="@drawable/previous"
+            app:tint="@color/white" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="AI 穿搭助手"
-            android:textColor="@color/brand_primary"
+            android:text="e-fit 穿搭小助手"
+            android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold" />
     </RelativeLayout>
-
-    <View
-        android:id="@+id/chat_header_divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/chat_header"
-        android:background="@color/divider_line" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_chat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/chat_header_divider"
-        android:layout_above="@+id/chat_input_area"
-        android:padding="8dp" />
+        android:layout_below="@id/top_bar"
+        android:layout_above="@id/styleButtonScroll"
+        android:padding="16dp"
+        android:clipToPadding="false"/>
 
-    <LinearLayout
-        android:id="@+id/chat_input_area"
+    <HorizontalScrollView
+        android:id="@+id/styleButtonScroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@id/inputLayout"
+        android:scrollbars="none"
+        android:background="#FDFBF9"
+        android:paddingVertical="10dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp">
+
+            <Button android:id="@+id/btn_handsome" android:layout_width="wrap_content" android:layout_height="40dp" android:text="😎 帥氣" android:background="@drawable/bg_style_button" android:layout_marginEnd="8dp" android:textAllCaps="false" android:textColor="#4A3E3D" />
+            <Button android:id="@+id/btn_cute" android:layout_width="wrap_content" android:layout_height="40dp" android:text="🎀 甜美" android:background="@drawable/bg_style_button" android:layout_marginEnd="8dp" android:textAllCaps="false" android:textColor="#4A3E3D" />
+            <Button android:id="@+id/btn_daily" android:layout_width="wrap_content" android:layout_height="40dp" android:text="☕ 韓系" android:background="@drawable/bg_style_button" android:layout_marginEnd="8dp" android:textAllCaps="false" android:textColor="#4A3E3D" />
+            <Button android:id="@+id/btn_retro" android:layout_width="wrap_content" android:layout_height="40dp" android:text="🎞️ 復古" android:background="@drawable/bg_style_button" android:layout_marginEnd="8dp" android:textAllCaps="false" android:textColor="#4A3E3D" />
+            <Button android:id="@+id/btn_sporty" android:layout_width="wrap_content" android:layout_height="40dp" android:text="👟 運動" android:background="@drawable/bg_style_button" android:layout_marginEnd="8dp" android:textAllCaps="false" android:textColor="#4A3E3D" />
+            <Button android:id="@+id/btn_minimalist" android:layout_width="wrap_content" android:layout_height="40dp" android:text="⚖️ 極簡" android:background="@drawable/bg_style_button" android:layout_marginEnd="8dp" android:textAllCaps="false" android:textColor="#4A3E3D" />
+            <Button android:id="@+id/btn_boho" android:layout_width="wrap_content" android:layout_height="40dp" android:text="🌵 波西" android:background="@drawable/bg_style_button" android:layout_marginEnd="8dp" android:textAllCaps="false" android:textColor="#4A3E3D" />
+            <Button android:id="@+id/btn_street" android:layout_width="wrap_content" android:layout_height="40dp" android:text=" skate 街頭" android:background="@drawable/bg_style_button" android:layout_marginEnd="8dp" android:textAllCaps="false" android:textColor="#4A3E3D" />
+            <Button android:id="@+id/btn_y2k" android:layout_width="wrap_content" android:layout_height="40dp" android:text="💿 Y2K" android:background="@drawable/bg_style_button" android:textAllCaps="false" android:textColor="#4A3E3D" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:id="@+id/inputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/white"
         android:orientation="horizontal"
+        android:padding="8dp"
         android:gravity="center_vertical"
-        android:padding="8dp">
+        android:background="#FFFFFF">
 
         <EditText
             android:id="@+id/et_message_input"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@drawable/corners_login"
-            android:backgroundTint="#F5F5F5"
             android:hint="輸入訊息..."
-            android:padding="12dp"
-            android:textColor="@color/text_primary"
-            android:textColorHint="@color/brand_secondary"
-            android:textSize="14sp" />
+            android:background="@drawable/bg_input_box"
+            android:paddingHorizontal="12dp" />
 
-        <ImageButton
-            android:id="@+id/btn_send_message"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+        <ImageView
+            android:id="@+id/btn_send"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_send"
             android:layout_marginStart="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_send"
-            app:tint="@color/brand_primary" />
+            android:clickable="true"
+            android:focusable="true"/>
     </LinearLayout>
+
 </RelativeLayout>

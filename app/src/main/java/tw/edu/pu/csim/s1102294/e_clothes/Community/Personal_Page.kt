@@ -2,9 +2,11 @@ package tw.edu.pu.csim.s1120336.e_fit.Community
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -16,6 +18,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import tw.edu.pu.csim.s1120336.e_fit.Match.Edit_Label
 import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
 import tw.edu.pu.csim.s1120336.e_fit.Match.Rank
 import tw.edu.pu.csim.s1120336.e_fit.R
@@ -68,13 +71,24 @@ class Personal_Page : AppCompatActivity() {
         signatureTextView.setOnClickListener { showEditDialog("個性簽名", "修改心情語錄", signatureTextView) }
         birthdayTextView.setOnClickListener { showEditDialog("生日", "修改生日與性別", birthdayTextView) }
 
-        btnEditTags.setOnClickListener { /* 這裡接之前寫好的風格選擇視窗 */ }
+        // 🌟 完美接通風格選擇視窗：點擊小畫筆跳轉至編輯頁面
+        btnEditTags.setOnClickListener {
+            val intent = Intent(this, Edit_Label::class.java)
+            startActivity(intent)
+        }
 
-        // 3. 初始讀取
+        // 3. 初始讀取個人資料與風格標籤
         fetchUserData()
+        loadUserStyles()
 
         // 4. 底部導覽列 (維持之前的邏輯)
         setupNavigation()
+    }
+
+    // 🌟 當使用者從編輯標籤頁面設定完返回時，自動重新載入最新標籤，無縫刷新畫面
+    override fun onResume() {
+        super.onResume()
+        loadUserStyles()
     }
 
     // 🌟 通用編輯對話框
@@ -133,6 +147,63 @@ class Personal_Page : AppCompatActivity() {
                 if (!imgUrl.isNullOrEmpty()) Glide.with(this).load(imgUrl).placeholder(R.drawable.user).into(circularImageView)
             }
         }
+    }
+
+    /**
+     * 🌟 核心整合：從 Firestore 雲端資料庫的 profile 文件讀取風格標籤，並動態轉成圓角 Chip 放進 ChipGroup
+     */
+    private fun loadUserStyles() {
+        val email = auth.currentUser?.email ?: return
+
+        db.collection(email).document("profile").get()
+            .addOnSuccessListener { document ->
+                // 每次更新前先把舊的標籤清除，避免重複疊加框框
+                chipGroup.removeAllViews()
+
+                if (document != null && document.exists()) {
+                    // 抓出儲存的風格字串陣列
+                    val savedStyles = document.get("myStyles") as? List<*>
+
+                    if (savedStyles != null && savedStyles.isNotEmpty()) {
+                        for (style in savedStyles) {
+                            val styleName = style.toString()
+
+                            // 動態建立一個符合 Material 規範的圓角展示用 Chip
+                            val chip = Chip(this).apply {
+                                text = styleName
+                                isClickable = false   // 主頁面只負責展示，不可重複點擊選取
+                                isCheckable = false
+                                setTextColor(Color.parseColor("#4A3E3D")) // 質感深咖啡色文字
+                                setChipBackgroundColorResource(android.R.color.white) // 白色圓角背景
+                            }
+
+                            // 把做好的風格標籤塞進 chipGroup 容器
+                            chipGroup.addView(chip)
+                        }
+                    } else {
+                        showEmptyTagPrompt()
+                    }
+                } else {
+                    showEmptyTagPrompt()
+                }
+            }
+            .addOnFailureListener { e ->
+                Log.e("Personal_Page", "讀取風格標籤失敗: ${e.message}")
+            }
+    }
+
+    /**
+     * 🌟 沒有風格標籤時的防呆提示
+     */
+    private fun showEmptyTagPrompt() {
+        chipGroup.removeAllViews()
+        val emptyChip = Chip(this).apply {
+            text = "尚未設定風格標籤，點擊右方編輯 📝"
+            isClickable = false
+            isCheckable = false
+            setTextColor(Color.GRAY)
+        }
+        chipGroup.addView(emptyChip)
     }
 
     private fun setupNavigation() {

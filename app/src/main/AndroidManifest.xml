@@ -17,12 +17,13 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@drawable/desktop_logo"
+
+        android:icon="@drawable/logo"
+        android:roundIcon="@drawable/logo"
+
         android:label="@string/app_name"
         android:supportsRtl="true"
-
         android:theme="@style/Theme.Eclothes"
-
         tools:targetApi="31">
 
         <activity

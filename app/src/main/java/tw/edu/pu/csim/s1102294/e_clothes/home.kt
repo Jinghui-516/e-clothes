@@ -21,27 +21,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.material.bottomnavigation.BottomNavigationView // 新增這行
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import tw.edu.pu.csim.s1120336.e_fit.Community.Friends
 import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
 import tw.edu.pu.csim.s1120336.e_fit.Match.Match
 import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
 import tw.edu.pu.csim.s1120336.e_fit.Match.Matching_details
 import tw.edu.pu.csim.s1120336.e_fit.Match.Rank
-import tw.edu.pu.csim.s1120336.e_fit.clothes.choose_add
+import tw.edu.pu.csim.s1120336.e_fit.clothes.Wardrobe
 import tw.edu.pu.csim.s1120336.e_fit.weather.RetrofitClient
 import tw.edu.pu.csim.s1120336.e_fit.weather.WeatherResponse
 import tw.edu.pu.csim.s1120336.e_fit.weather.WeatherService
 import tw.edu.pu.csim.s1120336.e_fit.weather.Time
 import java.text.SimpleDateFormat
 import java.util.*
-import tw.edu.pu.csim.s1120336.e_fit.clothes.Wardrobe
-import tw.edu.pu.csim.s1120336.e_fit.R
+
 class home : AppCompatActivity() {
 
     // Inner adapter class for match list
@@ -91,12 +89,14 @@ class home : AppCompatActivity() {
     }
 
     lateinit var profile: ImageView
-    // 🌟 新增：宣告 BottomNavigationView
     lateinit var bottomNavigationView: BottomNavigationView
 
     private lateinit var weatherService: WeatherService
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationTextView: TextView
+
+    // 🌟 新增：宣告一個用來儲存今日真實溫度的變數（預設值為 25 度防呆）
+    private var currentTempForChat: Int = 25
 
     lateinit var today_morning_time: TextView
     lateinit var today_morning_weather: ImageView
@@ -120,7 +120,7 @@ class home : AppCompatActivity() {
     lateinit var textView8: TextView
     private val matchList = mutableListOf<Match>()
     private lateinit var matchRecyclerView: RecyclerView
-    private lateinit var matchAdapter: MatchAdapter // 修改此處，直接使用內部類別
+    private lateinit var matchAdapter: MatchAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -131,48 +131,41 @@ class home : AppCompatActivity() {
         profile.setOnClickListener {
             val intent1 = Intent(this, Personal_Page::class.java)
             startActivity(intent1)
-            // 視情況決定要不要 finish()
         }
 
-        // 2. 🌟 綁定新的 BottomNavigationView 點擊邏輯
-        bottomNavigationView = findViewById(R.id.bottom_navigation)
 
-        // 🌟 更新：設定當前頁面為「天氣」圖示亮起
+
+        // 2. 綁定 BottomNavigationView 點擊邏輯
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.selectedItemId = R.id.nav_weather
 
         bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_weather -> {
-                    // 已經在天氣(首頁)了，不用做事
-                    true
-                }
+                R.id.nav_weather -> true
                 R.id.nav_wardrobe -> {
-                    // 跳轉到電子衣櫃頁面 (假設你的檔案叫 wardrobe)
                     val intent = Intent(this, Wardrobe::class.java)
                     startActivity(intent)
                     overridePendingTransition(0, 0)
                     true
                 }
                 R.id.nav_community -> {
-                    // 跳轉到社群動態時報 (依據你的設計圖 5，你可以替換成對應的 Activity)
                     val intent = Intent(this, Match_home::class.java)
                     startActivity(intent)
                     overridePendingTransition(0, 0)
                     true
                 }
                 R.id.nav_rank -> {
-                    // 🌟 這裡就是接通跳轉的地方！
                     val intent = Intent(this, Rank::class.java)
                     startActivity(intent)
-                    overridePendingTransition(0, 0) // 讓切換更順滑，沒有跳動感
-                    finish() // 關閉目前這一頁
+                    overridePendingTransition(0, 0)
+                    finish()
                     true
                 }
                 else -> false
             }
         }
 
-        // --- 以下完全保留你原本的天氣與定位邏輯 ---
+        // 定位與天氣初始化
         locationCity = "臺北市"
         locationTextView = findViewById(R.id.locationTextView)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -221,7 +214,6 @@ class home : AppCompatActivity() {
                 }
             }
 
-        textView8 = findViewById(R.id.textView8)
         today_morning_time = findViewById(R.id.today_morning_time)
         today_morning_weather = findViewById(R.id.today_morning_weather)
         today_morning_temperature = findViewById(R.id.today_morning_temperature)
@@ -238,16 +230,13 @@ class home : AppCompatActivity() {
         tomorrow_night_weather = findViewById(R.id.tomorrow_night_weather)
         tomorrow_night_temperature = findViewById(R.id.tomorrow_night_temperature)
 
-        // 將 home.kt 第 241 行改為：
         weatherService = RetrofitClient.service
         matchRecyclerView = findViewById(R.id.match_recycler_view)
         matchRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Initialize the adapter with an empty list
         matchAdapter = MatchAdapter(emptyList())
         matchRecyclerView.adapter = matchAdapter
 
-        // Fetch the "搭配" data from Firestore
         fetchMatchDataFromFirestore()
     }
 
@@ -261,17 +250,11 @@ class home : AppCompatActivity() {
                 db.collection(email)
                     .get()
                     .addOnSuccessListener { documents ->
-                        if (documents.isEmpty) {
-                            Log.e("Firestore", "No documents found!")
-                        } else {
+                        if (!documents.isEmpty) {
                             for (document in documents) {
-                                val match = document.toObject(tw.edu.pu.csim.s1120336.e_fit.Match.Match::class.java)
-
+                                val match = document.toObject(Match::class.java)
                                 if (match.isValid()) {
-                                    Log.d("MatchData", "Match: $match")
                                     matchList.add(match)
-                                } else {
-                                    Log.d("MatchData", "Invalid match: $match")
                                 }
                             }
                             runOnUiThread {
@@ -293,7 +276,7 @@ class home : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // 權限已授予
+            // Permission granted
         }
     }
 
@@ -302,10 +285,7 @@ class home : AppCompatActivity() {
         weatherService.getWeatherApi(authorization, locationCity)
             .enqueue(object : Callback<WeatherResponse> {
                 override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
-                    if (!response.isSuccessful) {
-                        Log.e("WeatherError", "Response not successful: ${response.errorBody()?.string()}")
-                        return
-                    }
+                    if (!response.isSuccessful) return
 
                     val weatherResponse = response.body()
                     weatherResponse?.records?.location?.firstOrNull { it.locationName == locationCity }?.let { location ->
@@ -344,6 +324,11 @@ class home : AppCompatActivity() {
         timeView.text = "${startTime.substring(0, 16)}  "
         tempView.text = "$temperature ˚C"
         setWeatherImage(weatherView, weatherCondition)
+
+        // 🌟 新增：當氣象署 API 回傳並成功渲染到「今天白天（today_morning_time）」畫面上時，同步把這個真實溫度轉成數字儲存起來
+        if (timeView == today_morning_time) {
+            currentTempForChat = temperature.toIntOrNull() ?: 25
+        }
     }
 
     private fun setWeatherImage(imageView: ImageView, weatherCondition: String) {
@@ -361,9 +346,9 @@ class home : AppCompatActivity() {
             "晴午後陰局部陣雨","晴午後陰局部短暫雨","晴午後陰局部短暫陣雨","陰局部雨","陰局部陣雨","陰局部短暫雨","陰局部短暫陣雨","陰時多雲局部雨","陰時多雲局部陣雨","陰時多雲局部短暫雨","陰時多雲局部短暫陣雨","多雲有霧有局部雨",
             "多雲有霧有局部陣雨","多雲有霧有局部短暫雨","多雲有霧有局部短暫陣雨","多雲有霧有陣雨","多雲有霧有短暫雨","多雲有霧有短暫陣雨","多雲局部雨有霧","多雲局部雨晨霧","多雲局部陣雨有霧","多雲局部陣雨晨霧","多雲局部短暫雨有霧",
             "多雲局部短暫雨晨霧","多雲局部短暫陣雨有霧","多雲局部短暫陣雨晨霧","多雲陣雨有霧","多雲短暫雨有霧","多雲短暫雨晨霧","多雲短暫陣雨有霧","多雲短暫陣雨晨霧","有霧有短暫雨","有霧有短暫陣雨","多雲時陰有霧有局部雨","多雲時陰有霧有局部陣雨",
-            "多雲時陰有霧有局部短暫雨","多雲時陰有霧有局部短暫陣雨","多雲時陰有霧有陣雨","多雲時陰有霧有短暫雨","多雲時陰有霧有短暫陣雨","多雲時陰局部雨有霧","多雲時陰局部陣雨有霧","多雲時陰局部短暫雨有霧","多雲時陰局部短暫陣雨有霧","多雲時陰陣雨有霧",
+            "多雲時陰有霧有局部短暫雨","多雲時陰有霧有局部開展陣雨","多雲時陰有霧有陣雨","多雲時陰有霧有短暫雨","多雲時陰有霧有短暫陣雨","多雲時陰局部雨有霧","多雲時陰局部陣雨有霧","多雲時陰局部短暫雨有霧","多雲時陰局部短暫陣雨有霧","多雲時陰陣雨有霧",
             "多雲時陰短暫雨有霧","多雲時陰短暫雨晨霧","多雲時陰短暫陣雨有霧","多雲時陰短暫陣雨晨霧","陰有霧有陣雨","陰局部雨有霧","陰局部陣雨有霧","陰局部短暫陣雨有霧","陰時多雲有霧有局部雨","陰時多雲有霧有局部陣雨","陰時多雲有霧有局部短暫雨",
-            "陰時多雲有霧有局部短暫陣雨","陰時多雲有霧有陣雨","陰時多雲有霧有短暫雨","陰時多雲有霧有短暫陣雨","陰時多雲局部雨有霧","陰時多雲局部陣雨有霧","陰時多雲局部短暫雨有霧","陰時多雲局部短暫陣雨有霧","陰時多雲陣雨有霧","陰時多雲短暫雨有霧",
+            "陰時多雲有霧有局部短暫陣雨","陰時多雲有霧有陣雨","陰時多雲有霧有短暫雨","陰時多雲有霧有短暫陣雨","陰時多雲局部雨有霧","陰時多雲局部陣雨有霧","陰時多雲局部短暫雨有霧","陰時多雲局部邊際有霧","陰時多雲陣雨有霧","陰時多雲短暫雨有霧",
             "陰時多雲短暫雨晨霧","陰時多雲短暫陣雨有霧","陰時多雲短暫陣雨晨霧","陰陣雨有霧","陰短暫雨有霧","陰短暫雨晨霧","陰短暫陣雨有霧","陰短暫陣雨晨霧"-> imageView.setImageResource(R.drawable.shower)
             "多雲局部陣雨或雪","多雲時陰有雨或雪","多雲時陰短暫雨或雪","多雲短暫雨或雪","陰有雨或雪","陰時多雲有雨或雪","陰時多雲短暫雨或雪","陰短暫雨或雪","多雲時陰有雪","多雲時陰短暫雪","多雲短暫雪","陰有雪","陰時多雲有雪","陰時多雲短暫雪","陰短暫雪",
             "有雨或雪","有雨或短暫雪","陰有雨或短暫雪","陰時多雲有雨或短暫雪","多雲時陰有雨或短暫雪","多雲有雨或短暫雪","多雲有雨或雪","多雲時晴有雨或雪","晴時多雲有雨或雪","晴有雨或雪","短暫雨或雪","多雲時晴短暫雨或雪","晴短暫雨或雪","晴時多雲短暫雨或雪",
@@ -383,6 +368,7 @@ class home : AppCompatActivity() {
             "陰時多雲短暫陣雨或雷雨有霧","陰時多雲短暫雷陣雨有霧","陰時多雲雷陣雨有霧","陰短暫陣雨或雷雨有霧","陰短暫雷陣雨有霧","雷陣雨有霧"-> imageView.setImageResource(R.drawable.thunderstorm)
         }
     }
+
     private fun getCurrentDate(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return dateFormat.format(Date())
