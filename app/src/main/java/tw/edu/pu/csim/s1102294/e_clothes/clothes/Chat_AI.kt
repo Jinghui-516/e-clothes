@@ -148,7 +148,7 @@ class Chat_AI : AppCompatActivity() {
             R.id.btn_minimalist to "【⚖️ 極簡主義】\n建議：質感白襯衫 + 灰色西裝褲。簡單就是高級！",
             R.id.btn_boho to "【🌵 波西米亞】\n建議：蕾絲長裙 + 皮革騎士靴。隨性浪漫感！",
             R.id.btn_street to "【🛹 美式街頭】\n建議：帽T + 工裝褲 + 滑板鞋。潮流感滿分！",
-            R.id.btn_y2k to "【💿 千禧 Y2K】\n建議：短版亮色上衣 + 低腰牛仔褲 + 厚底鞋。復古又閃耀！"
+            R.id.btn_y2k to "【💿 Y2K】\n建議：短版亮色上衣 + 低腰牛仔褲 + 厚底鞋。復古又閃耀！"
         )
 
         for ((id, advice) in styles) {
