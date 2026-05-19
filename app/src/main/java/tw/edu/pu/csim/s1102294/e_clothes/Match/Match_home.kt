@@ -5,6 +5,8 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View // 🌟 補上 View 匯入
+import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -15,6 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import tw.edu.pu.csim.s1120336.e_fit.Community.Friends // 🌟 補上 Friends 匯入
 import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
 import tw.edu.pu.csim.s1120336.e_fit.R
 import tw.edu.pu.csim.s1120336.e_fit.clothes.Wardrobe
@@ -25,9 +28,11 @@ class Match_home : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var fabAddPost: FloatingActionButton
     private lateinit var matchRecyclerView: RecyclerView
+    private lateinit var btnChatRoom: ImageView
+    private lateinit var btnSearchFriendsBar: View // 🌟 宣告頂部搜尋框變數
     private val db = FirebaseFirestore.getInstance()
 
-    // 🌟 多選照片啟動器 (最高 9 張)
+    // 多選照片啟動器
     private val pickMultipleImageLauncher = registerForActivityResult(
         ActivityResultContracts.PickMultipleVisualMedia(9)
     ) { uris: List<Uri> ->
@@ -48,24 +53,36 @@ class Match_home : AppCompatActivity() {
         fabAddPost = findViewById(R.id.fab_add_post)
         bottomNavigationView = findViewById(R.id.bottom_navigation)
 
-        // 2. 設定 RecyclerView
+        // 2. 綁定右上角聊天室按鈕
+        btnChatRoom = findViewById(R.id.btn_chat_room)
+        btnChatRoom.setOnClickListener {
+            val intent = Intent(this, ChatListActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 🌟 3. 綁定頂部長圓角搜尋框，點擊跳轉到加好友頁面
+        btnSearchFriendsBar = findViewById(R.id.btn_search_friends_bar)
+        btnSearchFriendsBar.setOnClickListener {
+            val intent = Intent(this, Friends::class.java)
+            startActivity(intent)
+        }
+
+        // 4. 設定 RecyclerView
         matchRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        // 3. 點擊 + 號彈出選單
+        // 5. 點擊 + 號彈出選單
         fabAddPost.setOnClickListener {
             showPostOptions()
         }
 
-        // 4. 從資料庫抓取貼文
+        // 6. 從資料庫抓取貼文
         fetchPosts()
 
-        // 5. 導覽列邏輯
+        // 7. 導覽列邏輯
         setupNavigation()
     }
 
-    // 🌟 核心功能：監聽 Firestore 貼文更新
     private fun fetchPosts() {
-        // 按照時間戳記由新到舊排序
         db.collection("AllPosts")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { value, error ->
@@ -73,15 +90,11 @@ class Match_home : AppCompatActivity() {
 
                 val posts = mutableListOf<Post>()
                 for (doc in value!!) {
-                    // 將資料庫文件轉換成 Post 物件
                     val post = doc.toObject(Post::class.java)
-                    // 🌟 關鍵修改：把資料庫的文件 ID 取出來，塞給這則貼文！
-                    // 這樣 PostAdapter 裡的按讚邏輯才知道要更新哪一筆資料
                     post.postId = doc.id
                     posts.add(post)
                 }
 
-                // 將資料餵給 Adapter
                 matchRecyclerView.adapter = PostAdapter(posts)
             }
     }

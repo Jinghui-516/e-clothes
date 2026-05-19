@@ -1,353 +1,154 @@
 package tw.edu.pu.csim.s1120336.e_fit.Match
 
 import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
+import android.graphics.Color
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
-import android.view.*
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.bumptech.glide.Glide
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import tw.edu.pu.csim.s1120336.e_fit.Community.Friends
 import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
 import tw.edu.pu.csim.s1120336.e_fit.R
-import tw.edu.pu.csim.s1120336.e_fit.clothes.FirebaseHelper
-import tw.edu.pu.csim.s1120336.e_fit.clothes.New_clothes
-import tw.edu.pu.csim.s1120336.e_fit.clothes.choose_add
-import tw.edu.pu.csim.s1120336.e_fit.home
-import tw.edu.pu.csim.s1120336.e_fit.login
 
-class Edit_Label : AppCompatActivity(), GestureDetector.OnGestureListener {
+class Edit_Label : AppCompatActivity() {
 
-    class LabelAdapter(
-        private val labels: MutableList<String>,
-        private val onLabelLongPress: (Int) -> Unit // Pass the index of the label to be deleted
-    ) : RecyclerView.Adapter<LabelAdapter.LabelViewHolder>() {
+    private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
-        class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val textView: TextView = itemView.findViewById(R.id.textView)
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LabelViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_label, parent, false)
-            return LabelViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: LabelViewHolder, position: Int) {
-            holder.textView.text = labels[position]
-
-            // Set long press listener on each label
-            holder.itemView.setOnLongClickListener {
-                onLabelLongPress(position) // Trigger long press action
-                true
-            }
-        }
-
-        override fun getItemCount(): Int {
-            return labels.size
-        }
-    }
-
-    private val labelList = mutableListOf<String>()
-    private lateinit var adapter: LabelAdapter
-
-    lateinit var Match: ImageView
-    lateinit var Home: ImageView
-    lateinit var Friend: ImageView
-    lateinit var addClothes: ImageView
-    lateinit var Personal_page: ImageView
-
-    lateinit var clothes: ImageView
-    lateinit var weather_name: TextView
-    lateinit var add_label: ImageView
-    lateinit var label: EditText
-    lateinit var match_name: EditText
-    var userId: String? = null
-    lateinit var firebaseHelper: FirebaseHelper
-    var imageUrl: String? = null
-    private val labelTexts = mutableListOf<String>()
-
-    lateinit var handsome: Button
-    lateinit var cute: Button
-    lateinit var daily: Button
-    lateinit var easy: Button
-    lateinit var formal: Button
+    // 🌟 用來存放使用者「目前勾選了哪些風格標籤」的清單
+    private val selectedStyles = mutableListOf<String>()
 
     lateinit var finish: ImageView
     lateinit var previous: ImageView
-    lateinit var gDetector: GestureDetector
-    lateinit var imgDisplay: ImageView
 
-    private var imageUrls: MutableList<String> = mutableListOf()
-    private var currentImageIndex = 0
+    // 宣告畫面上的風格按鈕
+    lateinit var btnHandsome: Button
+    lateinit var btnCute: Button
+    lateinit var btnDaily: Button
+    lateinit var btnEasy: Button
+    lateinit var btnFormal: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_label)
 
-        val currentUser = FirebaseAuth.getInstance().currentUser
+        // 確保用戶已登入
+        val currentUser = auth.currentUser
         if (currentUser == null) {
             Toast.makeText(this, "用戶未登入，請先登入", Toast.LENGTH_LONG).show()
-            val loginIntent = Intent(this, login::class.java)
-            startActivity(loginIntent)
             finish()
             return
-        } else {
-            userId = currentUser.uid
         }
 
-        val db = FirebaseFirestore.getInstance()
-
-        label = findViewById(R.id.label)
-        match_name = findViewById(R.id.match_name)
-        handsome = findViewById(R.id.handsome)
-        handsome.setOnClickListener { label.setText(handsome.text) }
-
-        cute = findViewById(R.id.cute)
-        cute.setOnClickListener { label.setText(cute.text) }
-
-        daily = findViewById(R.id.daily)
-        daily.setOnClickListener { label.setText(daily.text) }
-
-        easy = findViewById(R.id.easy)
-        easy.setOnClickListener { label.setText(easy.text) }
-
-        formal = findViewById(R.id.formal)
-        formal.setOnClickListener { label.setText(formal.text) }
-
+        // 1. 綁定按鈕元件
+        btnHandsome = findViewById(R.id.handsome)
+        btnCute = findViewById(R.id.cute)
+        btnDaily = findViewById(R.id.daily)
+        btnEasy = findViewById(R.id.easy)
+        btnFormal = findViewById(R.id.formal)
         finish = findViewById(R.id.finish)
+        previous = findViewById(R.id.previous)
+
+        // 2. 🌟 先去雲端撈取使用者「原本就選過」的風格，讓按鈕維持選取狀態，體驗更貼心
+        loadExistingStyles()
+
+        // 3. 設定按鈕的點擊多選魔法（點第一次加入並變色，再點一次移出並復原）
+        setupStyleButton(btnHandsome, "#帥氣")
+        setupStyleButton(btnCute, "#可愛")
+        setupStyleButton(btnDaily, "#日常")
+        setupStyleButton(btnEasy, "#休閒")
+        setupStyleButton(btnFormal, "#正式")
+
+        // 4. 返回按鈕
+        previous.setOnClickListener {
+            finish() // 直接結束，回到個人資料頁面
+        }
+
+        // 5. 🌟 完成儲存按鈕：把多選完的清單一次打包存進個人 Profile 裡
         finish.setOnClickListener {
-            saveDataToFirestore(db)
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(1000)
-                startActivity(Intent(this@Edit_Label, Match_home::class.java))
+            saveStylesToFirebase()
+        }
+    }
+
+    /**
+     * 🌟 核心多選切換邏輯：控制標籤選取、取消與視覺顏色變換
+     */
+    private fun setupStyleButton(button: Button, styleName: String) {
+        button.setOnClickListener {
+            if (selectedStyles.contains(styleName)) {
+                // 如果已經選過了 ➔ 移出選取清單
+                selectedStyles.remove(styleName)
+                button.setBackgroundColor(Color.parseColor("#EFEFEF")) // 換回原本未選取的淡灰色
+                button.setTextColor(Color.parseColor("#4A3E3D"))     // 換回深色文字
+            } else {
+                // 如果還沒選過 ➔ 新增進去
+                selectedStyles.add(styleName)
+                button.setBackgroundColor(Color.parseColor("#745E4D")) // 🌟 換成妳們 App 的招牌質感咖啡色！
+                button.setTextColor(Color.WHITE)                     // 文字變白色
+            }
+        }
+    }
+
+    /**
+     * 🌟 讀取現有風格：一開網頁自動幫使用者勾選好以前選過的標籤
+     */
+    private fun loadExistingStyles() {
+        val email = auth.currentUser?.email ?: return
+        db.collection(email).document("profile").get().addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val savedStyles = document.get("myStyles") as? List<*>
+                savedStyles?.forEach {
+                    val style = it.toString()
+                    selectedStyles.add(style)
+                    // 同步點亮原本就選好的按鈕顏色
+                    matchButtonUI(style)
+                }
+            }
+        }
+    }
+
+    /**
+     * 根據從雲端抓下來的標籤，點亮對應按鈕
+     */
+    private fun matchButtonUI(style: String) {
+        when (style) {
+            "#帥氣" -> setButtonSelectedVisual(btnHandsome)
+            "#可愛" -> setButtonSelectedVisual(btnCute)
+            "#日常" -> setButtonSelectedVisual(btnDaily)
+            "#休閒" -> setButtonSelectedVisual(btnEasy)
+            "#正式" -> setButtonSelectedVisual(btnFormal)
+        }
+    }
+
+    private fun setButtonSelectedVisual(button: Button) {
+        button.setBackgroundColor(Color.parseColor("#745E4D"))
+        button.setTextColor(Color.WHITE)
+    }
+
+    /**
+     * 🌟 寫入個人資料庫：精準存入個人 profile 中，完美銜接主頁刷新
+     */
+    private fun saveStylesToFirebase() {
+        val email = auth.currentUser?.email ?: return
+
+        val data = hashMapOf(
+            "myStyles" to selectedStyles // 直接用 List 形式覆蓋存檔
+        )
+
+        Toast.makeText(this, "正在儲存風格標籤...", Toast.LENGTH_SHORT).show()
+
+        // 🌟 對齊妳在 Personal_Page.kt 寫的讀取路徑：集合(email) -> 文件("profile")
+        db.collection(email).document("profile")
+            .set(data, com.google.firebase.firestore.SetOptions.merge()) // 用 merge 確保原本的其他資料不被蓋掉
+            .addOnSuccessListener {
+                Toast.makeText(this, "風格標籤設定成功！", Toast.LENGTH_SHORT).show()
+                // 儲存成功，高高興興返回個人主頁，這時 Personal_Page 的 onResume 會自動抓到最新改好的標籤！
                 finish()
             }
-        }
-
-        previous = findViewById(R.id.previous)
-        previous.setOnClickListener {
-            startActivity(Intent(this, New_Match::class.java))
-            finish()
-        }
-
-        imgDisplay = findViewById(R.id.imgDisplay)
-
-        // 接收圖片 URL
-        val hatUrl = intent.getStringExtra("hatUrl")
-        val clothesUrl = intent.getStringExtra("clothesUrl")
-        val pantsUrl = intent.getStringExtra("pantsUrl")
-        val shoesUrl = intent.getStringExtra("shoesUrl")
-//        val bodyPhotoUrl = intent.getStringExtra("bodyPhotoUrl")
-
-        val imageUriString = intent.getStringExtra("bodyPhotoUrl")
-        val imageBitmap = intent.getParcelableExtra<Bitmap>("capturedPhoto")
-
-// 根据传递的内容设置ImageView
-        when {
-            imageUriString != null -> {
-                val imageUri = Uri.parse(imageUriString)
-                imageUrls.add(imageUriString)  // Add the new image URL to the list
-                currentImageIndex = imageUrls.size - 1  // Update to point to the new image
-                // 原本：Picasso.get().load(imageUri).into(imgDisplay)
-                Glide.with(this).load(imageUri).into(imgDisplay)
-
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "儲存失敗，請重試", Toast.LENGTH_SHORT).show()
+                Log.e("Edit_Label", "儲存風格失敗: ${e.message}")
             }
-            imageBitmap != null -> {
-                // Convert the Bitmap to a file URI if necessary, and add it to the imageUrls
-                val fileUri = Uri.parse(MediaStore.Images.Media.insertImage(contentResolver, imageBitmap, "CapturedImage", ""))
-                imageUrls.add(fileUri.toString())  // Add the new image URI to the list
-                currentImageIndex = imageUrls.size - 1  // Update to point to the new image
-                imgDisplay.setImageBitmap(imageBitmap) // Display the image directly
-            }
-            else -> {
-                Toast.makeText(this, "加載失敗", Toast.LENGTH_LONG).show()
-            }
-        }
-
-        imageUrls.add(hatUrl ?: "")
-        imageUrls.add(clothesUrl ?: "")
-        imageUrls.add(pantsUrl ?: "")
-        imageUrls.add(shoesUrl ?: "")
-        imageUrls.add(imageUriString ?: "")
-
-        updateImage()
-
-        gDetector = GestureDetector(this, this)
-
-        Home = findViewById(R.id.Home)
-        Home.setOnClickListener {
-            startActivity(Intent(this, home::class.java))
-            finish()
-        }
-
-        Match = findViewById(R.id.Match)
-        Match.setOnClickListener {
-            startActivity(Intent(this, Match_home::class.java))
-            finish()
-        }
-
-        addClothes = findViewById(R.id.addClothes)
-        addClothes.setOnClickListener {
-            startActivity(Intent(this, choose_add::class.java))
-        }
-
-        Friend = findViewById(R.id.Friend)
-        Friend.setOnClickListener {
-            startActivity(Intent(this, Friends::class.java))
-            finish()
-        }
-
-        Personal_page = findViewById(R.id.Personal_page)
-        Personal_page.setOnClickListener {
-            startActivity(Intent(this, Personal_Page::class.java))
-            finish()
-        }
-
-        firebaseHelper = FirebaseHelper()
-        weather_name = findViewById(R.id.weather_name)
-        val weather: ImageView = findViewById(R.id.weather)
-        weather.setOnClickListener {
-            showWeatherMenu(it)
-        }
-
-        val recyclerView = findViewById<RecyclerView>(R.id.labelRecyclerView)
-        adapter = LabelAdapter(labelList) { position -> showDeleteDialog(position) }
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = GridLayoutManager(this, 4)
-
-        add_label = findViewById(R.id.add_label)
-        add_label.setOnClickListener {
-            if (label.text.isNotEmpty()) {
-                val newLabel = label.text.toString()
-                labelList.add(newLabel)
-                adapter.notifyItemInserted(labelList.size - 1)
-                labelTexts.add(newLabel)
-                label.text.clear()
-            } else {
-                Toast.makeText(this, "標籤不能為空", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
-
-    private fun showDeleteDialog(position: Int) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("刪除標籤")
-        builder.setMessage("確定要刪除此標籤嗎？")
-        builder.setPositiveButton("是") { _, _ ->
-            labelList.removeAt(position)
-            labelTexts.removeAt(position)
-            adapter.notifyItemRemoved(position)
-        }
-        builder.setNegativeButton("否", null)
-        builder.show()
-    }
-
-    private fun saveDataToFirestore(db: FirebaseFirestore) {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        currentUser?.email?.let { email ->
-            val weatherCategory = weather_name.text.toString()
-            val hatUrl = imageUrls.getOrNull(0) ?: ""
-            val clothesUrl = imageUrls.getOrNull(1) ?: ""
-            val pantsUrl = imageUrls.getOrNull(2) ?: ""
-            val shoesUrl = imageUrls.getOrNull(3) ?: ""
-            val bodyPhotoUrl = imageUrls.getOrNull(4) ?: ""
-
-            db.collection(email)
-                .get()
-                .addOnSuccessListener { documents ->
-                    val maxNumber = documents.mapNotNull { doc -> doc.id.replace("搭配", "").toIntOrNull() }.maxOrNull() ?: 0
-                    val newDocumentName = "搭配${maxNumber + 1}"
-                    val matchName = match_name.text?.toString().orEmpty()
-                    val labelsList = labelTexts.toList()
-
-                    val data = hashMapOf(
-                        "搭配名稱" to matchName,
-                        "天氣種類" to weatherCategory,
-                        "標籤" to labelsList,
-                        "上衣圖片網址" to clothesUrl,
-                        "鞋子圖片網址" to shoesUrl,
-                        "褲子圖片網址" to pantsUrl,
-                        "帽子圖片網址" to hatUrl,
-                        "身體照" to bodyPhotoUrl
-                    )
-
-                    db.collection(email)
-                        .document(newDocumentName)
-                        .set(data)
-                        .addOnSuccessListener {
-                            Log.d("Firestore", "Document added with ID: $newDocumentName")
-                        }
-                        .addOnFailureListener { e ->
-                            Log.w("Firestore", "Error adding document", e)
-                        }
-                }
-        }
-    }
-
-    // 顯示天氣選擇菜單的函數
-    private fun showWeatherMenu(view: View) {
-        val weatherOptions = arrayOf("晴天", "陰天", "雨天", "雪天")
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("選擇天氣")
-        builder.setItems(weatherOptions) { dialog, which ->
-            // 根據選擇的天氣，將其顯示在 weather_name TextView 中
-            weather_name.text = weatherOptions[which]
-        }
-        builder.show()
-    }
-
-    private fun updateImage() {
-        val imageUrlToLoad = if (imageUrls[currentImageIndex].isNotEmpty()) {
-            imageUrls[currentImageIndex]
-        } else {
-            "https://www.example.com/default_image.jpg"  // 用你自己預設的圖片 URL
-        }
-        // 原本：Picasso.get().load(imageUrlToLoad).error(R.drawable.m).into(imgDisplay)
-        Glide.with(this)
-            .load(imageUrlToLoad)
-            .error(R.drawable.m)
-            .into(imgDisplay)
-
-    }
-
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        return gDetector.onTouchEvent(event) || super.onTouchEvent(event)
-    }
-
-    // 1. 將 e1 修改為 MotionEvent? (增加問號)
-    override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
-        // 因為 e1 可能為空，所以使用 e1?.x 安全調用或 if 判斷
-        if (e1 != null) {
-            if (e1.x - e2.x > 50) {
-                currentImageIndex = (currentImageIndex + 1) % imageUrls.size
-            } else if (e2.x - e1.x > 50) {
-                currentImageIndex = (currentImageIndex - 1 + imageUrls.size) % imageUrls.size
-            }
-            updateImage()
-        }
-        return true
-    }
-
-    // 2. 將 e1 修改為 MotionEvent? (增加問號)
-    override fun onScroll(e1: MotionEvent?, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
-        return false
-    }
-
-    override fun onDown(e: MotionEvent): Boolean = true
-    override fun onShowPress(e: MotionEvent) {}
-    override fun onLongPress(e: MotionEvent) {}
-    override fun onSingleTapUp(e: MotionEvent): Boolean = true
 }

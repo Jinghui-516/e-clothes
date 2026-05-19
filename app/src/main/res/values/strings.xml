@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">e-fit</string>
+    <string name="user_name_placeholder">\@使用者名稱</string>
 </resources>

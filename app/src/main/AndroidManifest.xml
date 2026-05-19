@@ -39,6 +39,10 @@
         <activity android:name=".clothes.add_dress" android:exported="false" />
         <activity android:name=".clothes.add_clothes" android:exported="false" />
         <activity android:name=".clothes.add_hat" android:exported="false" />
+        <activity android:name=".Match.CommentActivity" android:exported="false" />
+        <activity android:name=".Match.ChatListActivity" android:exported="false" />
+        <activity android:name=".Match.ChatRoomActivity" android:exported="false" />
+
 
         <activity
             android:name=".clothes.Wardrobe"

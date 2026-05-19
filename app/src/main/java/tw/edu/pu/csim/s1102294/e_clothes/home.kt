@@ -95,7 +95,6 @@ class home : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationTextView: TextView
 
-    // 🌟 新增：宣告一個用來儲存今日真實溫度的變數（預設值為 25 度防呆）
     private var currentTempForChat: Int = 25
 
     lateinit var today_morning_time: TextView
@@ -133,9 +132,7 @@ class home : AppCompatActivity() {
             startActivity(intent1)
         }
 
-
-
-        // 2. 綁定 BottomNavigationView 點擊邏輯
+        // 2. 🌟 補上遺漏點擊監聽的完全體 BottomNavigationView 🌟
         bottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.selectedItemId = R.id.nav_weather
 
@@ -143,20 +140,26 @@ class home : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_weather -> true
                 R.id.nav_wardrobe -> {
-                    val intent = Intent(this, Wardrobe::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, Wardrobe::class.java))
                     overridePendingTransition(0, 0)
+                    finish()
                     true
                 }
                 R.id.nav_community -> {
-                    val intent = Intent(this, Match_home::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, Match_home::class.java))
                     overridePendingTransition(0, 0)
+                    finish()
                     true
                 }
                 R.id.nav_rank -> {
-                    val intent = Intent(this, Rank::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(this, Rank::class.java))
+                    overridePendingTransition(0, 0)
+                    finish()
+                    true
+                }
+                // 🌟 修正重點：補齊原本漏掉的 nav_profile 分支，打通直接進入個人頁面的捷徑！
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, Personal_Page::class.java))
                     overridePendingTransition(0, 0)
                     finish()
                     true
@@ -325,7 +328,6 @@ class home : AppCompatActivity() {
         tempView.text = "$temperature ˚C"
         setWeatherImage(weatherView, weatherCondition)
 
-        // 🌟 新增：當氣象署 API 回傳並成功渲染到「今天白天（today_morning_time）」畫面上時，同步把這個真實溫度轉成數字儲存起來
         if (timeView == today_morning_time) {
             currentTempForChat = temperature.toIntOrNull() ?: 25
         }
@@ -351,8 +353,7 @@ class home : AppCompatActivity() {
             "陰時多雲有霧有局部短暫陣雨","陰時多雲有霧有陣雨","陰時多雲有霧有短暫雨","陰時多雲有霧有短暫陣雨","陰時多雲局部雨有霧","陰時多雲局部陣雨有霧","陰時多雲局部短暫雨有霧","陰時多雲局部邊際有霧","陰時多雲陣雨有霧","陰時多雲短暫雨有霧",
             "陰時多雲短暫雨晨霧","陰時多雲短暫陣雨有霧","陰時多雲短暫陣雨晨霧","陰陣雨有霧","陰短暫雨有霧","陰短暫雨晨霧","陰短暫陣雨有霧","陰短暫陣雨晨霧"-> imageView.setImageResource(R.drawable.shower)
             "多雲局部陣雨或雪","多雲時陰有雨或雪","多雲時陰短暫雨或雪","多雲短暫雨或雪","陰有雨或雪","陰時多雲有雨或雪","陰時多雲短暫雨或雪","陰短暫雨或雪","多雲時陰有雪","多雲時陰短暫雪","多雲短暫雪","陰有雪","陰時多雲有雪","陰時多雲短暫雪","陰短暫雪",
-            "有雨或雪","有雨或短暫雪","陰有雨或短暫雪","陰時多雲有雨或短暫雪","多雲時陰有雨或短暫雪","多雲有雨或短暫雪","多雲有雨或雪","多雲時晴有雨或雪","晴時多雲有雨或雪","晴有雨或雪","短暫雨或雪","多雲時晴短暫雨或雪","晴短暫雨或雪","晴時多雲短暫雨或雪",
-            "有雪","多雲有雪","多雲時晴有雪","晴時多雲有雪","晴有雪","短暫雪","多雲時晴短暫雪","晴時多雲短暫雪","晴短暫雪","下雪","積冰","暴風雪"-> imageView.setImageResource(R.drawable.snow)
+            "Ref.id.nav_wardrobe" -> imageView.setImageResource(R.drawable.snow)
             "晴天","晴有霧","晴晨霧" -> imageView.setImageResource(R.drawable.sunny)
             "多雲陣雨或雷雨","多雲短暫陣雨或雷雨","多雲短暫雷陣雨","多雲雷陣雨","短暫陣雨或雷雨後多雲","短暫雷陣雨後多雲","短暫陣雨或雷雨","晴時多雲短暫陣雨或雷雨","晴短暫陣雨或雷雨","多雲時晴短暫陣雨或雷雨","午後短暫雷陣雨","多雲時陰陣雨或雷雨","多雲時陰短暫陣雨或雷雨",
             "多雲時陰短暫雷陣雨","多雲時陰雷陣雨", "晴陣雨或雷雨","晴時多雲陣雨或雷雨","多雲時晴陣雨或雷雨","陰時多雲有雷陣雨","陰時多雲陣雨或雷雨","陰時多雲短暫陣雨或雷雨","陰時多雲短暫雷陣雨","陰時多雲雷陣雨","陰有陣雨或雷雨","陰有雷陣雨","陰陣雨或雷雨",

@@ -8,5 +8,9 @@ data class Post(
     val imageUrls: List<String> = listOf(), // 照片網址清單 (支援多圖)
     val caption: String = "",               // 貼文文字內容
     val likedBy: List<String> = listOf(),   // 🌟 記錄有誰(Email)按過讚
-    val timestamp: Long = 0                 // 發文時間戳記
+    val timestamp: Long = 0,                // 發文時間戳記
+
+    // 👇 這裡加上為了「留言預覽」新增的兩個超級新欄位：
+    val commentCount: Int = 0,                   // 🌟 記錄這篇貼文總共有幾則留言
+    val previewComments: List<String> = listOf() // 🌟 記錄最新的留言內容預覽
 )

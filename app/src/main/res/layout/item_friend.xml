@@ -1,61 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:paddingVertical="12dp"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground">
 
-    <!-- 朋友的頭貼圖片 -->
     <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/friend_image"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:layout_marginEnd="16dp"
+        android:id="@+id/iv_friend_avatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/user"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_launcher_foreground"
-        app:shapeAppearanceOverlay="@style/CircularImageView"
-        app:strokeColor="@color/black" />
+        app:shapeAppearanceOverlay="@style/CircularImageView"/>
 
-    <!-- 用戶名和電子郵件容器 -->
-    <LinearLayout
+    <TextView
+        android:id="@+id/tv_friend_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_gravity="center"
-        android:orientation="vertical">
+        android:layout_marginStart="16dp"
+        android:text="好友名字"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
 
-        <!-- 用戶名 -->
-        <TextView
-            android:id="@+id/friend_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Username"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black" />
-
-        <!-- 電子郵件 -->
-        <TextView
-            android:id="@+id/friend_email"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="user@example.com"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray" />
-
-<!--        <TextView-->
-<!--            android:id="@+id/birthday_gender"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="TextView" />-->
-
-<!--        <TextView-->
-<!--            android:id="@+id/signature"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="TextView" />-->
-
-    </LinearLayout>
+    <ImageView
+        android:id="@+id/btn_chat_icon"  android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@android:drawable/stat_notify_chat"
+        app:tint="@color/brand_primary"/>
 </LinearLayout>

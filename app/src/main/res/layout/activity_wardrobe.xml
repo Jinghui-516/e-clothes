@@ -146,7 +146,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:src="@android:drawable/ic_dialog_dialer"
+        android:src="@drawable/ic_robot_head"
         app:tint="@color/white"
         app:backgroundTint="@color/brand_primary"
         app:elevation="6dp"

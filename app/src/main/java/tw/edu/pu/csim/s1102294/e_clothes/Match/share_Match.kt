@@ -1,5 +1,7 @@
 package tw.edu.pu.csim.s1120336.e_fit.Match
 
+import android.content.Intent
+import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -55,7 +57,7 @@ class share_Match : AppCompatActivity() {
         }
     }
 
-    // 🌟 核心：處理多張圖片上傳
+    // 處理多張圖片上傳
     private fun startMultiUpload(caption: String) {
         progressBar.visibility = View.VISIBLE
         val uploadedUrls = mutableListOf<String>()
@@ -81,24 +83,57 @@ class share_Match : AppCompatActivity() {
         }
     }
 
+    // 🌟 修改重點：發文時先抓取個人真實姓名與頭貼，再寫入 AllPosts
     private fun saveToFirestore(caption: String, imageUrls: List<String>) {
-        val email = auth.currentUser?.email ?: "anonymous"
-        val postData = hashMapOf(
-            "userEmail" to email,
-            "imageUrls" to imageUrls, // 這裡現在是一個網址清單 (List)
-            "caption" to caption,
-            "timestamp" to System.currentTimeMillis(),
-            "likes" to 0,
-            "likedBy" to listOf<String>()
-        )
+        val email = auth.currentUser?.email
+        if (email == null) {
+            progressBar.visibility = View.GONE
+            btnShare.isEnabled = true
+            Toast.makeText(this, "登入逾期，請重新登入", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        db.collection("AllPosts").add(postData).addOnSuccessListener {
-            Toast.makeText(this, "發布成功！", Toast.LENGTH_SHORT).show()
-            finish()
+        // 先去抓取妳的真實姓名跟頭貼
+        db.collection(email).document("個人資料").get().addOnSuccessListener { doc ->
+            var realName = "匿名使用者"
+            var realAvatar = ""
+
+            if (doc.exists()) {
+                realName = doc.getString("使用者名稱") ?: "匿名使用者"
+                realAvatar = doc.getString("頭貼圖片") ?: ""
+            }
+
+            // 組裝完整的貼文真實資料
+            val postData = hashMapOf(
+                "userName" to realName,           // 🌟 寫入真實姓名
+                "userAvatar" to realAvatar,       // 🌟 寫入真實頭貼
+                "userEmail" to email,
+                "imageUrls" to imageUrls,
+                "caption" to caption,
+                "timestamp" to System.currentTimeMillis(),
+                "likedBy" to listOf<String>(),
+                "commentCount" to 0,              // 🌟 補上新功能需要的留言數
+                "previewComments" to listOf<String>() // 🌟 補上新功能需要的預覽清單
+            )
+
+            // 正式寫入全域貼文資料庫
+            db.collection("AllPosts").add(postData).addOnSuccessListener {
+                Toast.makeText(this, "發布成功！", Toast.LENGTH_SHORT).show()
+                finish()
+            }.addOnFailureListener {
+                progressBar.visibility = View.GONE
+                btnShare.isEnabled = true
+                Toast.makeText(this, "發布失敗，請重試", Toast.LENGTH_SHORT).show()
+            }
+        }.addOnFailureListener {
+            // 如果抓資料失敗的防呆
+            progressBar.visibility = View.GONE
+            btnShare.isEnabled = true
+            Toast.makeText(this, "讀取個人資料失敗", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // 🌟 內部 Adapter 用於顯示預覽圖
+    // 內部 Adapter 用於顯示預覽圖
     inner class ImagePreviewAdapter(private val uris: List<Uri>) :
         RecyclerView.Adapter<ImagePreviewAdapter.ViewHolder>() {
 

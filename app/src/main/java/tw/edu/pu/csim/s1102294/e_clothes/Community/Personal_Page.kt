@@ -2,14 +2,20 @@ package tw.edu.pu.csim.s1120336.e_fit.Community
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Typeface
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.chip.Chip
@@ -17,34 +23,33 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
-import tw.edu.pu.csim.s1120336.e_fit.Match.Edit_Label
-import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
-import tw.edu.pu.csim.s1120336.e_fit.Match.Rank
+import tw.edu.pu.csim.s1120336.e_fit.Match.*
 import tw.edu.pu.csim.s1120336.e_fit.R
 import tw.edu.pu.csim.s1120336.e_fit.clothes.Wardrobe
 import tw.edu.pu.csim.s1120336.e_fit.home
-import java.util.*
 
 class Personal_Page : AppCompatActivity() {
 
-    lateinit var nameTextView: TextView
-    lateinit var birthdayTextView: TextView
-    lateinit var signatureTextView: TextView
-    lateinit var circularImageView: ShapeableImageView
-    lateinit var chipGroup: ChipGroup
+    private lateinit var nameTextView: TextView
+    private lateinit var birthdayTextView: TextView
+    private lateinit var signatureTextView: TextView
+    private lateinit var circularImageView: ShapeableImageView
+    private lateinit var chipGroup: ChipGroup
+    private lateinit var rvPersonalGrid: RecyclerView
+    private lateinit var btnEditTags: ImageView
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val storage = FirebaseStorage.getInstance()
 
-    // 🌟 用於挑選圖片的 Launchers
+    // 🌟 核心變數：儲存當前查看的 Email (預設為自己)
+    private var targetEmail: String = ""
+
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val imageUri = result.data?.data
-            if (imageUri != null) {
-                uploadProfileImage(imageUri)
-            }
+            result.data?.data?.let { uploadProfileImage(it) }
         }
     }
 
@@ -52,158 +57,107 @@ class Personal_Page : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_personal_page)
 
-        // 1. 綁定 UI
+        // 接收外部傳來的 Email，若沒傳則預設為自己
+        targetEmail = intent.getStringExtra("TARGET_EMAIL") ?: auth.currentUser?.email ?: ""
+
         nameTextView = findViewById(R.id.nameTextView)
         birthdayTextView = findViewById(R.id.birthdayTextView)
         signatureTextView = findViewById(R.id.signatureTextView)
         circularImageView = findViewById(R.id.circularImageView)
         chipGroup = findViewById(R.id.chipGroup)
-        val btnEditTags: ImageView = findViewById(R.id.btn_edit_tags)
+        rvPersonalGrid = findViewById(R.id.rv_personal_grid)
+        btnEditTags = findViewById(R.id.btn_edit_tags)
+        rvPersonalGrid.layoutManager = GridLayoutManager(this, 3)
 
-        // 2. 設置點擊監聽 (點哪裡改哪裡)
-        circularImageView.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            pickImageLauncher.launch(intent)
+        // 🌟 權限控制：只有查看自己頁面時才允許編輯
+        val isMe = (targetEmail == auth.currentUser?.email)
+        if (isMe) {
+            circularImageView.setOnClickListener {
+                val intent = Intent(Intent.ACTION_PICK).apply { type = "image/*" }
+                pickImageLauncher.launch(intent)
+            }
+            nameTextView.setOnClickListener { showEditDialog("使用者名稱", "修改暱稱", nameTextView) }
+            signatureTextView.setOnClickListener { showEditDialog("個性簽名", "修改心情語錄", signatureTextView) }
+            birthdayTextView.setOnClickListener { showEditDialog("生日", "修改生日", birthdayTextView) }
+            btnEditTags.setOnClickListener { startActivity(Intent(this, Edit_Label::class.java)) }
+        } else {
+            // 查看他人檔案時，隱藏編輯按鈕
+            btnEditTags.visibility = View.GONE
         }
 
-        nameTextView.setOnClickListener { showEditDialog("使用者名稱", "修改暱稱", nameTextView) }
-        signatureTextView.setOnClickListener { showEditDialog("個性簽名", "修改心情語錄", signatureTextView) }
-        birthdayTextView.setOnClickListener { showEditDialog("生日", "修改生日與性別", birthdayTextView) }
-
-        // 🌟 完美接通風格選擇視窗：點擊小畫筆跳轉至編輯頁面
-        btnEditTags.setOnClickListener {
-            val intent = Intent(this, Edit_Label::class.java)
-            startActivity(intent)
-        }
-
-        // 3. 初始讀取個人資料與風格標籤
-        fetchUserData()
-        loadUserStyles()
-
-        // 4. 底部導覽列 (維持之前的邏輯)
+        fetchUserData(targetEmail)
+        loadUserStyles(targetEmail)
+        fetchMyHistoryPosts(targetEmail)
         setupNavigation()
     }
 
-    // 🌟 當使用者從編輯標籤頁面設定完返回時，自動重新載入最新標籤，無縫刷新畫面
-    override fun onResume() {
-        super.onResume()
-        loadUserStyles()
-    }
-
-    // 🌟 通用編輯對話框
-    private fun showEditDialog(field: String, title: String, targetView: TextView) {
-        val editText = EditText(this)
-        editText.setText(targetView.text.toString().replace("@", ""))
-
-        AlertDialog.Builder(this)
-            .setTitle(title)
-            .setView(editText)
-            .setPositiveButton("更新") { _, _ ->
-                val newValue = editText.text.toString()
-                updateFirestoreField(field, newValue) {
-                    if (field == "使用者名稱") targetView.text = "@$newValue"
-                    else targetView.text = newValue
-                }
+    private fun fetchMyHistoryPosts(email: String) {
+        db.collection("AllPosts").whereEqualTo("userEmail", email)
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, _ ->
+                val images = snapshot?.documents?.mapNotNull { it.get("imageUrls") as? List<*> }
+                    ?.filter { it.isNotEmpty() }?.map { it[0].toString() } ?: emptyList()
+                rvPersonalGrid.adapter = PersonalGridAdapter(images)
             }
-            .setNegativeButton("取消", null)
-            .show()
     }
 
-    // 🌟 上傳圖片到 Storage 並更新資料庫
-    private fun uploadProfileImage(uri: Uri) {
-        val email = auth.currentUser?.email ?: return
-        val ref = storage.reference.child("profiles/$email/avatar.jpg")
-
-        Toast.makeText(this, "正在上傳頭貼...", Toast.LENGTH_SHORT).show()
-
-        ref.putFile(uri).addOnSuccessListener {
-            ref.downloadUrl.addOnSuccessListener { downloadUrl ->
-                updateFirestoreField("頭貼圖片", downloadUrl.toString()) {
-                    Glide.with(this).load(downloadUrl).into(circularImageView)
-                    Toast.makeText(this, "頭貼更新成功", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
-
-    private fun updateFirestoreField(field: String, value: String, onSuccess: () -> Unit) {
-        val email = auth.currentUser?.email ?: return
-        db.collection(email).document("個人資料")
-            .update(field, value)
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { Toast.makeText(this, "更新失敗", Toast.LENGTH_SHORT).show() }
-    }
-
-    private fun fetchUserData() {
-        val email = auth.currentUser?.email ?: return
-        db.collection(email).document("個人資料").get().addOnSuccessListener { doc ->
-            if (doc.exists()) {
-                nameTextView.text = "@${doc.getString("使用者名稱") ?: "未設定"}"
-                signatureTextView.text = doc.getString("個性簽名") ?: "點擊編輯簽名..."
-                birthdayTextView.text = doc.getString("生日") ?: "點擊編輯生日..."
-
-                val imgUrl = doc.getString("頭貼圖片")
-                if (!imgUrl.isNullOrEmpty()) Glide.with(this).load(imgUrl).placeholder(R.drawable.user).into(circularImageView)
-            }
-        }
-    }
-
-    /**
-     * 🌟 核心整合：從 Firestore 雲端資料庫的 profile 文件讀取風格標籤，並動態轉成圓角 Chip 放進 ChipGroup
-     */
-    private fun loadUserStyles() {
-        val email = auth.currentUser?.email ?: return
-
-        db.collection(email).document("profile").get()
-            .addOnSuccessListener { document ->
-                // 每次更新前先把舊的標籤清除，避免重複疊加框框
-                chipGroup.removeAllViews()
-
-                if (document != null && document.exists()) {
-                    // 抓出儲存的風格字串陣列
-                    val savedStyles = document.get("myStyles") as? List<*>
-
-                    if (savedStyles != null && savedStyles.isNotEmpty()) {
-                        for (style in savedStyles) {
-                            val styleName = style.toString()
-
-                            // 動態建立一個符合 Material 規範的圓角展示用 Chip
-                            val chip = Chip(this).apply {
-                                text = styleName
-                                isClickable = false   // 主頁面只負責展示，不可重複點擊選取
-                                isCheckable = false
-                                setTextColor(Color.parseColor("#4A3E3D")) // 質感深咖啡色文字
-                                setChipBackgroundColorResource(android.R.color.white) // 白色圓角背景
-                            }
-
-                            // 把做好的風格標籤塞進 chipGroup 容器
-                            chipGroup.addView(chip)
-                        }
-                    } else {
-                        showEmptyTagPrompt()
+    private fun loadUserStyles(email: String) {
+        db.collection(email).document("profile").get().addOnSuccessListener { doc ->
+            chipGroup.removeAllViews()
+            val styles = doc.get("myStyles") as? List<*> ?: return@addOnSuccessListener
+            for (style in styles) {
+                val name = style.toString().replace("#", "")
+                val chip = Chip(this).apply {
+                    text = "#$name"
+                    setTypeface(null, Typeface.BOLD)
+                    chipCornerRadius = dpToPx(20f)
+                    chipStrokeWidth = dpToPx(1f)
+                    val color = when (name) {
+                        "可愛" -> "#FF35B2"
+                        "帥氣" -> "#1976D2"
+                        "日常" -> "#E65100"
+                        else -> "#6A1B9A"
                     }
-                } else {
-                    showEmptyTagPrompt()
+                    chipStrokeColor = ColorStateList.valueOf(Color.parseColor(color))
+                    setTextColor(Color.parseColor(color))
+                    setChipBackgroundColorResource(android.R.color.white)
                 }
+                chipGroup.addView(chip)
             }
-            .addOnFailureListener { e ->
-                Log.e("Personal_Page", "讀取風格標籤失敗: ${e.message}")
-            }
+        }
     }
 
-    /**
-     * 🌟 沒有風格標籤時的防呆提示
-     */
-    private fun showEmptyTagPrompt() {
-        chipGroup.removeAllViews()
-        val emptyChip = Chip(this).apply {
-            text = "尚未設定風格標籤，點擊右方編輯 📝"
-            isClickable = false
-            isCheckable = false
-            setTextColor(Color.GRAY)
+    private fun dpToPx(dp: Float): Float = dp * resources.displayMetrics.density
+
+    private fun showEditDialog(field: String, title: String, target: TextView) {
+        val et = EditText(this).apply { setText(target.text.toString().replace("@", "")) }
+        AlertDialog.Builder(this).setTitle(title).setView(et)
+            .setPositiveButton("更新") { _, _ ->
+                val v = et.text.toString()
+                db.collection(targetEmail).document("個人資料").update(field, v).addOnSuccessListener {
+                    target.text = if (field == "使用者名稱") "@$v" else v
+                }
+            }.show()
+    }
+
+    private fun uploadProfileImage(uri: Uri) {
+        val ref = storage.reference.child("profiles/$targetEmail/avatar.jpg")
+        ref.putFile(uri).addOnSuccessListener {
+            ref.downloadUrl.addOnSuccessListener { url ->
+                db.collection(targetEmail).document("個人資料").update("頭貼圖片", url.toString()).addOnSuccessListener {
+                    Glide.with(this).load(url).into(circularImageView)
+                }
+            }
         }
-        chipGroup.addView(emptyChip)
+    }
+
+    private fun fetchUserData(email: String) {
+        db.collection(email).document("個人資料").get().addOnSuccessListener { doc ->
+            nameTextView.text = "@${doc.getString("使用者名稱") ?: "未設定"}"
+            signatureTextView.text = doc.getString("個性簽名") ?: "這人很懶，什麼都沒留..."
+            birthdayTextView.text = doc.getString("生日") ?: "未設定"
+            doc.getString("頭貼圖片")?.let { Glide.with(this).load(it).into(circularImageView) }
+        }
     }
 
     private fun setupNavigation() {
@@ -215,8 +169,17 @@ class Personal_Page : AppCompatActivity() {
                 R.id.nav_wardrobe -> { startActivity(Intent(this, Wardrobe::class.java)); finish(); true }
                 R.id.nav_rank -> { startActivity(Intent(this, Rank::class.java)); finish(); true }
                 R.id.nav_community -> { startActivity(Intent(this, Match_home::class.java)); finish(); true }
-                else -> true
+                else -> false
             }
         }
+    }
+
+    inner class PersonalGridAdapter(private val images: List<String>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+            object : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_personal_grid, parent, false)) {}
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, pos: Int) {
+            Glide.with(holder.itemView.context).load(images[pos]).into(holder.itemView.findViewById(R.id.iv_grid_image))
+        }
+        override fun getItemCount() = images.size
     }
 }
