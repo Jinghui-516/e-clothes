@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:id="@+id/option_ask_ai"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:clickable="true">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🤖 詢問 AI 穿搭意見" android:textSize="18sp"/>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEE"/>
+
+    <LinearLayout
+        android:id="@+id/option_remove_bg"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:clickable="true">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="✂️ AI 照片去背工具" android:textSize="18sp"/>
+    </LinearLayout>
+</LinearLayout>

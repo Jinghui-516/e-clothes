@@ -8,19 +8,17 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.LinearLayout
 import android.widget.ImageView
-import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import tw.edu.pu.csim.s1120336.e_fit.Community.Friends
 import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
 import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
 import tw.edu.pu.csim.s1120336.e_fit.Match.Rank
 import tw.edu.pu.csim.s1120336.e_fit.R
-import tw.edu.pu.csim.s1120336.e_fit.Setting
 import tw.edu.pu.csim.s1120336.e_fit.home
 
 class Wardrobe : AppCompatActivity() {
@@ -53,11 +51,37 @@ class Wardrobe : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // 🌟 2. 初始化「AI 機器人」按鈕並跳轉至 Chat_AI
+        // 🌟 2. 核心整合：初始化「AI 機器人」按鈕，點擊後彈出選單（包含三大功能）
         fabAiRobot = findViewById(R.id.fab_ai_robot)
-        fabAiRobot.setOnClickListener {
-            val intent = Intent(this, Chat_AI::class.java)
-            startActivity(intent)
+        fabAiRobot.setOnClickListener { view ->
+            // 建立彈出式選單，直接錨定在按鈕旁邊
+            val popup = PopupMenu(this, view)
+            popup.menu.add(0, 1, 0, "🤖 詢問 AI 穿搭意見")
+            popup.menu.add(0, 2, 1, "✂️ AI 照片一鍵去背")
+            popup.menu.add(0, 3, 2, "📁 我的去背作品集") // 🌟 新增的專屬相簿入口
+
+            // 設定選單點擊事件
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    1 -> {
+                        // 點擊選項 1 -> 前往原有的 AI 聊天
+                        startActivity(Intent(this, Chat_AI::class.java))
+                        true
+                    }
+                    2 -> {
+                        // 點擊選項 2 -> 前往 AI 去背助手
+                        startActivity(Intent(this, RemoveBgActivity::class.java))
+                        true
+                    }
+                    3 -> {
+                        // 點擊選項 3 -> 前往專屬去背相簿
+                        startActivity(Intent(this, RemoveBgAlbumActivity::class.java))
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show() // 顯示選單
         }
 
         // 導航列設定
@@ -95,7 +119,7 @@ class Wardrobe : AppCompatActivity() {
             }
         }
 
-        // 🌟 原本的分頁點擊跳轉 (如果 choose_add 寫好了，以後可以考慮統一跳轉至 choose_add)
+        // 原本的分頁點擊跳轉
         findViewById<LinearLayout>(R.id.hat_layout).setOnClickListener {
             startActivity(Intent(this, add_hat::class.java))
         }
@@ -184,10 +208,8 @@ class Wardrobe : AppCompatActivity() {
     private fun downloadFromFirebaseStorage(path: String, imageView: ImageView) {
         val storage = FirebaseStorage.getInstance()
 
-        // 🌟 這裡加上一個防呆判斷，確保路徑不為空
         if (path.isEmpty()) return
 
-        // 判斷路徑是完整 URL 還是 Storage 相對路徑
         val storageRef = if (path.startsWith("http")) {
             storage.getReferenceFromUrl(path)
         } else {

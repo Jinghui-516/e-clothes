@@ -17,23 +17,15 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-
         android:icon="@drawable/logo"
         android:roundIcon="@drawable/logo"
-
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Eclothes"
         tools:targetApi="31">
 
-        <activity
-            android:name=".Match.Rank"
-            android:exported="false" />
-
-        <activity
-            android:name=".Match.Matching_details"
-            android:exported="false" />
-
+        <activity android:name=".Match.Rank" android:exported="false" />
+        <activity android:name=".Match.Matching_details" android:exported="false" />
         <activity android:name=".clothes.add_shoes" android:exported="false" />
         <activity android:name=".clothes.add_pants" android:exported="false" />
         <activity android:name=".clothes.add_dress" android:exported="false" />
@@ -42,23 +34,11 @@
         <activity android:name=".Match.CommentActivity" android:exported="false" />
         <activity android:name=".Match.ChatListActivity" android:exported="false" />
         <activity android:name=".Match.ChatRoomActivity" android:exported="false" />
-
-
-        <activity
-            android:name=".clothes.Wardrobe"
-            android:exported="false" />
-        <activity android:name=".clothes.Chat_AI"
-            android:exported="false" />
-        <activity
-            android:name=".clothes.choose_add"
-            android:exported="false" />
-        <activity
-            android:name=".whether_to_login"
-            android:exported="false" />
-        <activity
-            android:name=".clothes.New_clothes"
-            android:exported="false" />
-
+        <activity android:name=".clothes.Wardrobe" android:exported="false" />
+        <activity android:name=".clothes.Chat_AI" android:exported="false" />
+        <activity android:name=".clothes.choose_add" android:exported="false" />
+        <activity android:name=".whether_to_login" android:exported="false" />
+        <activity android:name=".clothes.New_clothes" android:exported="false" />
         <activity android:name=".Community.Other_Page" android:exported="false" />
         <activity android:name=".Community.Personal_Page" android:exported="false" />
         <activity android:name=".Community.Friend_Invite" android:exported="false" />
@@ -66,7 +46,6 @@
         <activity android:name=".Community.add_Friends" android:exported="false" />
         <activity android:name=".Community.Friends" android:exported="false" />
         <activity android:name=".Community.Liked_Post" android:exported="false" />
-
         <activity android:name=".Setting" android:exported="false" />
         <activity android:name=".Match.edit_Chosen_Match" android:exported="false" />
         <activity android:name=".change_password" android:exported="false" />
@@ -75,11 +54,7 @@
         <activity android:name=".Match.share_Match" android:exported="false" />
         <activity android:name=".Match.new_match_dress" android:exported="false" />
         <activity android:name=".Match.New_Match" android:exported="false" />
-
-        <activity
-            android:name=".Match.Match_home"
-            android:exported="false" />
-
+        <activity android:name=".Match.Match_home" android:exported="false" />
         <activity android:name=".forget_password" android:exported="false" />
         <activity android:name=".register" android:exported="false" />
         <activity android:name=".home" android:exported="false" />
@@ -94,6 +69,8 @@
             </intent-filter>
         </activity>
 
-    </application>
+        <activity android:name=".clothes.RemoveBgActivity" android:exported="false" />
+        <activity android:name=".clothes.RemoveBgAlbumActivity" android:exported="false" />
 
+    </application>
 </manifest>
