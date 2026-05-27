@@ -1,4 +1,19 @@
 <resources>
     <string name="app_name">e-fit</string>
     <string name="user_name_placeholder">\@使用者名稱</string>
+    <string-array name="clothing_categories">
+        <item>請選擇種類</item>
+        <item>上衣</item>
+        <item>褲子</item>
+        <item>外套</item>
+        <item>洋裝</item>
+    </string-array>
+
+    <string-array name="clothing_colors">
+        <item>請選擇顏色</item>
+        <item>白色</item>
+        <item>黑色</item>
+        <item>灰色</item>
+        <item>藍色</item>
+    </string-array>
 </resources>

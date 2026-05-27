@@ -1,4 +1,4 @@
-package tw.edu.pu.csim.s1120336.e_fit.clothes  // 🌟 1. 修改為妳的新學號與 e_fit 專案路徑
+package tw.edu.pu.csim.s1120336.e_fit.clothes
 
 import android.content.Context
 import android.content.Intent
@@ -15,14 +15,11 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import tw.edu.pu.csim.s1120336.e_fit.clothes.FirebaseHelper
-import tw.edu.pu.csim.s1120336.e_fit.home
-
-  // 🌟 2. 修改首頁跳轉的 import 路徑
-import tw.edu.pu.csim.s1120336.e_fit.R     // 🌟 3. 修正 R 檔引用！刪除原本錯誤的 firebase.auth.R
+import tw.edu.pu.csim.s1120336.e_fit.R
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -32,7 +29,6 @@ class New_clothes : AppCompatActivity() {
     // --- 內部類別與變數 ---
     class LabelAdapter(private val labels: MutableList<String>, private val onLabelLongPress: (Int) -> Unit) : RecyclerView.Adapter<LabelAdapter.LabelViewHolder>() {
         class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            // 🌟 這裡會自動對應到妳新專案對應的 item_label.xml 內的文字 ID
             val textView: TextView = itemView.findViewById(R.id.textView)
         }
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LabelViewHolder {
@@ -53,6 +49,9 @@ class New_clothes : AppCompatActivity() {
     private var selectedColor: String = "未指定"
     private var imageUrl: String? = null
 
+    // 🌟 接收作品集網址的變數
+    private var portfolioImageUrl: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_clothes)
@@ -60,33 +59,33 @@ class New_clothes : AppCompatActivity() {
         val db = FirebaseFirestore.getInstance()
         firebaseHelper = FirebaseHelper()
 
-        // 1. 綁定 UI
         val clothesImageView: ImageView = findViewById(R.id.clothes)
         val classificationTextView: TextView = findViewById(R.id.Classification_name)
         val labelInput: EditText = findViewById(R.id.label)
         val finishBtn: ImageView = findViewById(R.id.finish)
         val previousBtn: ImageView = findViewById(R.id.previous)
 
-        // 2. 接收前一頁資料
+        // 2. 接收前一頁資料 (包含從作品集傳來的雲端網址)
         val imageUriString = intent.getStringExtra("selectedImageUri")
         val imageBitmap = intent.getParcelableExtra<Bitmap>("capturedPhoto")
+        portfolioImageUrl = intent.getStringExtra("portfolioImageUrl") // 🌟 接收作品集網址
+
         val passedCategory = intent.getStringExtra("category")
         selectedColor = intent.getStringExtra("color") ?: "未指定"
 
-        // 3. 設定畫面初始值 (自動填入分類)
+        // 3. 設定畫面初始值
         classificationTextView.text = passedCategory ?: "未分類"
         when {
+            // 🌟 如果是作品集來的，直接用 Glide 載入雲端圖片顯示在畫面上！
+            portfolioImageUrl != null -> Glide.with(this).load(portfolioImageUrl).into(clothesImageView)
             imageUriString != null -> clothesImageView.setImageURI(Uri.parse(imageUriString))
             imageBitmap != null -> clothesImageView.setImageBitmap(imageBitmap)
         }
 
-        // 4. 底部導覽列設定 (保持一致)
+        // 4. 底部導覽列設定
         val bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNav.selectedItemId = R.id.nav_wardrobe
-        bottomNav.setOnItemSelectedListener { item ->
-            // 這裡可以複製妳專案中導覽列跳轉邏輯
-            true
-        }
+        bottomNav.setOnItemSelectedListener { item -> true }
 
         // 5. 標籤快捷鍵
         findViewById<Button>(R.id.handsome).setOnClickListener { labelInput.setText("帥氣") }
@@ -113,7 +112,13 @@ class New_clothes : AppCompatActivity() {
         previousBtn.setOnClickListener { finish() }
 
         finishBtn.setOnClickListener {
-            uploadProcess(db, clothesImageView)
+            // 🌟 判斷：如果是作品集照片，直接秒寫入資料庫；否則執行傳統的 Bitmap 上傳
+            if (portfolioImageUrl != null) {
+                imageUrl = portfolioImageUrl
+                saveToFirestore(db, portfolioImageUrl!!)
+            } else {
+                uploadProcess(db, clothesImageView)
+            }
         }
     }
 
@@ -145,7 +150,8 @@ class New_clothes : AppCompatActivity() {
 
         db.collection(email).add(data).addOnSuccessListener {
             Toast.makeText(this, "新增完成！", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, home::class.java))
+            // 🌟 已經幫妳改成跳轉到 Wardrobe (衣櫃) 了！
+            startActivity(Intent(this, Wardrobe::class.java))
             finish()
         }.addOnFailureListener { e ->
             Log.e("FirestoreError", "存入失敗", e)

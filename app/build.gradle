@@ -36,9 +36,9 @@ android {
         jvmTarget = '17'
     }
 
-    // 如果你有用到 ViewBinding，可以順便開啟
-    viewBinding {
-        enabled = true
+    // 🌟 正確的 ViewBinding 啟動方式
+    buildFeatures {
+        viewBinding true
     }
 }
 
@@ -52,8 +52,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
 
-    // 🌟 Gemini AI 大腦
-    // 🌟 升級版本到 0.12.0，這樣它才認識 Gemini 1.5 Flash
+    // 🌟 Gemini AI 大腦 (已升級至 0.12.0)
     implementation 'com.google.ai.client.generativeai:generativeai:0.9.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
 
@@ -64,7 +63,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.flexbox:flexbox:3.0.0'
 
-    // 圖片加載 (推薦主要使用 Glide)
+    // 圖片加載 (Glide)
     implementation 'com.github.bumptech.glide:glide:4.15.0'
     kapt 'com.github.bumptech.glide:compiler:4.15.0'
 

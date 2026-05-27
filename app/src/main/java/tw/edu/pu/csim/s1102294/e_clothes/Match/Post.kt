@@ -12,5 +12,5 @@ data class Post(
 
     // 👇 這裡加上為了「留言預覽」新增的兩個超級新欄位：
     val commentCount: Int = 0,                   // 🌟 記錄這篇貼文總共有幾則留言
-    val previewComments: List<String> = listOf() // 🌟 記錄最新的留言內容預覽
+    val previewComments: List<String> = listOf(),// 🌟 記錄最新的留言內容預覽
 )
