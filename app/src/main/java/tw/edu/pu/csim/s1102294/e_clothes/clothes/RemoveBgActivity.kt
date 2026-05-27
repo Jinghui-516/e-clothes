@@ -35,7 +35,7 @@ class RemoveBgActivity : AppCompatActivity() {
 
     private var imageUri: Uri? = null
     private var resultUri: Uri? = null
-    private val apiKey = "2Au5hCaTaqZHeUxLMNi4Kyxs" // 妳的 Remove.bg API Key
+    private val apiKey = "6kXFQvqtwRWixcpfVP9Gc4LC" // 妳的 Remove.bg API Key
 
     private val selectImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
