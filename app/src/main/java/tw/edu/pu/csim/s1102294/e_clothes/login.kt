@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import tw.edu.pu.csim.s1120336.e_fit.home
 import java.util.*
 import tw.edu.pu.csim.s1120336.e_fit.R
 class login : AppCompatActivity() {

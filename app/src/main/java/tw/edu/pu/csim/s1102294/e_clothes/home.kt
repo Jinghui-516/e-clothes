@@ -22,12 +22,14 @@ import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
+import tw.edu.pu.csim.s1120336.e_fit.FittingRoomActivity
 import tw.edu.pu.csim.s1120336.e_fit.Match.Match
 import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
 import tw.edu.pu.csim.s1120336.e_fit.Match.Matching_details
@@ -39,6 +41,8 @@ import tw.edu.pu.csim.s1120336.e_fit.weather.WeatherService
 import tw.edu.pu.csim.s1120336.e_fit.weather.Time
 import java.text.SimpleDateFormat
 import java.util.*
+import tw.edu.pu.csim.s1120336.e_fit.R
+
 
 class home : AppCompatActivity() {
 
@@ -57,7 +61,6 @@ class home : AppCompatActivity() {
                 matchNameTextView.text = match.搭配名稱
                 weatherCategoryTextView.text = match.天氣種類
 
-                // Load images
                 Glide.with(itemView.context).load(match.帽子圖片網址).into(hatImageView)
                 Glide.with(itemView.context).load(match.上衣圖片網址).into(clothesImageView)
                 Glide.with(itemView.context).load(match.褲子圖片網址).into(pantsImageView)
@@ -90,6 +93,7 @@ class home : AppCompatActivity() {
 
     lateinit var profile: ImageView
     lateinit var bottomNavigationView: BottomNavigationView
+    lateinit var fabFittingRoom: FloatingActionButton
 
     private lateinit var weatherService: WeatherService
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -125,14 +129,12 @@ class home : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        // 1. 綁定頂部大頭貼跳轉
         profile = findViewById(R.id.profile)
         profile.setOnClickListener {
             val intent1 = Intent(this, Personal_Page::class.java)
             startActivity(intent1)
         }
 
-        // 2. 🌟 補上遺漏點擊監聽的完全體 BottomNavigationView 🌟
         bottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.selectedItemId = R.id.nav_weather
 
@@ -157,7 +159,6 @@ class home : AppCompatActivity() {
                     finish()
                     true
                 }
-                // 🌟 修正重點：補齊原本漏掉的 nav_profile 分支，打通直接進入個人頁面的捷徑！
                 R.id.nav_profile -> {
                     startActivity(Intent(this, Personal_Page::class.java))
                     overridePendingTransition(0, 0)
@@ -168,7 +169,11 @@ class home : AppCompatActivity() {
             }
         }
 
-        // 定位與天氣初始化
+        fabFittingRoom = findViewById(R.id.fab_fitting_room)
+        fabFittingRoom.setOnClickListener {
+            startActivity(Intent(this, FittingRoomActivity::class.java))
+        }
+
         locationCity = "臺北市"
         locationTextView = findViewById(R.id.locationTextView)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -352,8 +357,7 @@ class home : AppCompatActivity() {
             "多雲時陰短暫雨有霧","多雲時陰短暫雨晨霧","多雲時陰短暫陣雨有霧","多雲時陰短暫陣雨晨霧","陰有霧有陣雨","陰局部雨有霧","陰局部陣雨有霧","陰局部短暫陣雨有霧","陰時多雲有霧有局部雨","陰時多雲有霧有局部陣雨","陰時多雲有霧有局部短暫雨",
             "陰時多雲有霧有局部短暫陣雨","陰時多雲有霧有陣雨","陰時多雲有霧有短暫雨","陰時多雲有霧有短暫陣雨","陰時多雲局部雨有霧","陰時多雲局部陣雨有霧","陰時多雲局部短暫雨有霧","陰時多雲局部邊際有霧","陰時多雲陣雨有霧","陰時多雲短暫雨有霧",
             "陰時多雲短暫雨晨霧","陰時多雲短暫陣雨有霧","陰時多雲短暫陣雨晨霧","陰陣雨有霧","陰短暫雨有霧","陰短暫雨晨霧","陰短暫陣雨有霧","陰短暫陣雨晨霧"-> imageView.setImageResource(R.drawable.shower)
-            "多雲局部陣雨或雪","多雲時陰有雨或雪","多雲時陰短暫雨或雪","多雲短暫雨或雪","陰有雨或雪","陰時多雲有雨或雪","陰時多雲短暫雨或雪","陰短暫雨或雪","多雲時陰有雪","多雲時陰短暫雪","多雲短暫雪","陰有雪","陰時多雲有雪","陰時多雲短暫雪","陰短暫雪",
-            "Ref.id.nav_wardrobe" -> imageView.setImageResource(R.drawable.snow)
+            "多雲局部陣雨或雪","多雲時陰有雨或雪","多雲時陰短暫雨或雪","多雲短暫雨或雪","陰有雨或雪","陰時多雲有雨或雪","陰時多雲短暫雨或雪","陰短暫雨或雪","多雲時陰有雪","多雲時陰短暫雪","多雲短暫雪","陰有雪","陰時多雲有雪","陰時多雲短暫雪","陰短暫雪" -> imageView.setImageResource(R.drawable.snow)
             "晴天","晴有霧","晴晨霧" -> imageView.setImageResource(R.drawable.sunny)
             "多雲陣雨或雷雨","多雲短暫陣雨或雷雨","多雲短暫雷陣雨","多雲雷陣雨","短暫陣雨或雷雨後多雲","短暫雷陣雨後多雲","短暫陣雨或雷雨","晴時多雲短暫陣雨或雷雨","晴短暫陣雨或雷雨","多雲時晴短暫陣雨或雷雨","午後短暫雷陣雨","多雲時陰陣雨或雷雨","多雲時陰短暫陣雨或雷雨",
             "多雲時陰短暫雷陣雨","多雲時陰雷陣雨", "晴陣雨或雷雨","晴時多雲陣雨或雷雨","多雲時晴陣雨或雷雨","陰時多雲有雷陣雨","陰時多雲陣雨或雷雨","陰時多雲短暫陣雨或雷雨","陰時多雲短暫雷陣雨","陰時多雲雷陣雨","陰有陣雨或雷雨","陰有雷陣雨","陰陣雨或雷雨",

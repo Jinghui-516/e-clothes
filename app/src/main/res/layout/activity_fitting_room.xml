@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".FittingRoomActivity">
+
+    <!-- 頂部導航與標題 -->
+    <LinearLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/brand_primary" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="人形試穿"
+            android:textAlignment="center"
+            android:textColor="@color/brand_primary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="32dp"
+            android:layout_height="32dp" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/header_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/brand_primary"
+        app:layout_constraintTop_toBottomOf="@id/header_layout"/>
+
+    <!-- 🌟 截圖打包區：把模特兒跟衣服包在一起，方便一鍵截圖 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/outfit_capture_area"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/header_divider"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- 👗 最底層：模特兒素體 -->
+        <ImageView
+            android:id="@+id/iv_mannequin_base"
+            android:layout_width="220dp"
+            android:layout_height="600dp"
+            android:layout_marginTop="20dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/mannequin_body"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <!-- 1. 帽子軌道 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_hats"
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            android:layout_marginTop="75dp"
+            android:clipToPadding="false"
+            android:paddingHorizontal="140dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 2. 上衣軌道 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_tops"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_marginTop="160dp"
+            android:clipToPadding="false"
+            android:paddingHorizontal="95dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 3. 下著軌道 (🌟 解決超高腰：從 245dp 改成 310dp 往下壓) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_bottoms"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:layout_marginTop="310dp"
+            android:clipToPadding="false"
+            android:paddingHorizontal="95dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 4. 鞋子軌道 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_shoes"
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:layout_marginTop="470dp"
+            android:clipToPadding="false"
+            android:paddingHorizontal="110dp"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 🌟 新增：儲存搭配按鈕 (懸浮在右下角) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btn_save_outfit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:src="@android:drawable/ic_menu_save"
+        app:tint="@color/white"
+        app:backgroundTint="@color/brand_primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

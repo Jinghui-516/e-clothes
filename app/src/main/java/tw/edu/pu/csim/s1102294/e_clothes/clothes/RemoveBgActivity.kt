@@ -1,5 +1,7 @@
 package tw.edu.pu.csim.s1120336.e_fit.clothes
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -24,6 +26,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import tw.edu.pu.csim.s1120336.e_fit.R
 import java.io.File
+import java.io.FileOutputStream
 
 class RemoveBgActivity : AppCompatActivity() {
 
@@ -37,32 +40,30 @@ class RemoveBgActivity : AppCompatActivity() {
     private var resultUri: Uri? = null
     private val apiKey = "6kXFQvqtwRWixcpfVP9Gc4LC" // 妳的 Remove.bg API Key
 
-    private val selectImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            imageUri = uri
-            resultUri = null
-            Glide.with(this).load(uri).into(ivPreview)
-            btnRemoveBg.visibility = View.VISIBLE
-            btnSaveImage.visibility = View.GONE
-            btnSelectImage.text = "更換圖片"
+    private val selectImageLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            if (uri != null) {
+                imageUri = uri
+                resultUri = null
+                Glide.with(this).load(uri).into(ivPreview)
+                btnRemoveBg.visibility = View.VISIBLE
+                btnSaveImage.visibility = View.GONE
+                btnSelectImage.text = "更換圖片"
+            }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_remove_bg)
 
-        // 綁定 UI 元件
         ivPreview = findViewById(R.id.iv_preview)
         progressBar = findViewById(R.id.progress_bar)
         btnSelectImage = findViewById(R.id.btn_select_image)
         btnRemoveBg = findViewById(R.id.btn_remove_bg)
         btnSaveImage = findViewById(R.id.btn_save_image)
 
-        // 1. 選擇圖片
         btnSelectImage.setOnClickListener { selectImageLauncher.launch("image/*") }
 
-        // 2. 執行去背
         btnRemoveBg.setOnClickListener {
             imageUri?.let { uri ->
                 progressBar.visibility = View.VISIBLE
@@ -78,17 +79,21 @@ class RemoveBgActivity : AppCompatActivity() {
                     if (result != null) {
                         resultUri = result
                         Glide.with(this@RemoveBgActivity).load(result).into(ivPreview)
-                        Toast.makeText(this@RemoveBgActivity, "去背成功！", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@RemoveBgActivity, "去背與裁切成功！", Toast.LENGTH_SHORT)
+                            .show()
                         btnRemoveBg.visibility = View.GONE
-                        btnSaveImage.visibility = View.VISIBLE // 顯示儲存按鈕
+                        btnSaveImage.visibility = View.VISIBLE
                     } else {
-                        Toast.makeText(this@RemoveBgActivity, "去背失敗，請檢查網路", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@RemoveBgActivity,
+                            "去背失敗，請檢查網路",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }
         }
 
-        // 3. 儲存圖片至 Firebase
         btnSaveImage.setOnClickListener {
             resultUri?.let { uri ->
                 saveImageToAppAlbum(uri)
@@ -98,7 +103,6 @@ class RemoveBgActivity : AppCompatActivity() {
         }
     }
 
-    // 核心去背 API 邏輯
     private suspend fun performRemoveBackground(uri: Uri): Uri? = withContext(Dispatchers.IO) {
         try {
             val client = OkHttpClient()
@@ -109,8 +113,13 @@ class RemoveBgActivity : AppCompatActivity() {
 
             val requestBody = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("image_file", "image.jpg", bytes.toRequestBody("image/jpeg".toMediaTypeOrNull()))
+                .addFormDataPart(
+                    "image_file",
+                    "image.jpg",
+                    bytes.toRequestBody("image/jpeg".toMediaTypeOrNull())
+                )
                 .addFormDataPart("size", "auto")
+                .addFormDataPart("crop", "true")
                 .build()
 
             val request = Request.Builder()
@@ -122,9 +131,16 @@ class RemoveBgActivity : AppCompatActivity() {
             val response = client.newCall(request).execute()
             if (response.isSuccessful) {
                 response.body?.bytes()?.let { responseBytes ->
-                    // 🌟 修正重點：加上時間戳記，確保每次去背的暫存檔名不同，打破 Glide 快取魔咒！
+                    val originalBitmap =
+                        BitmapFactory.decodeByteArray(responseBytes, 0, responseBytes.size)
+                    val croppedBitmap = cropTransparentEdges(originalBitmap)
+
                     val file = File(cacheDir, "temp_result_${System.currentTimeMillis()}.png")
-                    file.writeBytes(responseBytes)
+                    val outputStream = FileOutputStream(file)
+                    croppedBitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                    outputStream.flush()
+                    outputStream.close()
+
                     return@withContext Uri.fromFile(file)
                 }
             }
@@ -134,43 +150,101 @@ class RemoveBgActivity : AppCompatActivity() {
         null
     }
 
-    // 🌟 全新升級：儲存至 App 專屬的 Firebase 去背相簿
+    private fun cropTransparentEdges(bitmap: Bitmap): Bitmap {
+        var top = bitmap.height
+        var bottom = 0
+        var left = bitmap.width
+        var right = 0
+        var isEmpty = true
+
+        for (x in 0 until bitmap.width) {
+            for (y in 0 until bitmap.height) {
+                val pixel = bitmap.getPixel(x, y)
+                if (pixel != android.graphics.Color.TRANSPARENT) {
+                    isEmpty = false
+                    if (x < left) left = x
+                    if (x > right) right = x
+                    if (y < top) top = y
+                    if (y > bottom) bottom = y
+                }
+            }
+        }
+        if (isEmpty) return bitmap
+
+        val newWidth = right - left + 1
+        val newHeight = bottom - top + 1
+        return Bitmap.createBitmap(bitmap, left, top, newWidth, newHeight)
+    }
+
+    // 🌟 全新升級：儲存至 App 專屬的 Firebase 去背相簿 (記憶體直傳版)
     private fun saveImageToAppAlbum(uri: Uri) {
         val email = FirebaseAuth.getInstance().currentUser?.email ?: return
         val timestamp = System.currentTimeMillis()
 
-        // 設定 Storage 的儲存路徑
+// 🌟 校正回歸：讓系統自動去抓 google-services.json 裡的正確地址！
         val storageRef = FirebaseStorage.getInstance().reference.child("remove_bg/$email/$timestamp.png")
 
-        // 更新 UI 狀態
         progressBar.visibility = View.VISIBLE
         btnSaveImage.isEnabled = false
         btnSaveImage.text = "上傳至專屬相簿中..."
 
-        // 1. 先把圖片上傳到 Firebase Storage
-        storageRef.putFile(uri).addOnSuccessListener {
-            // 2. 上傳成功後，取得圖片的下載網址
-            storageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
-                val db = FirebaseFirestore.getInstance()
-                val data = hashMapOf(
-                    "imageUrl" to downloadUrl.toString(),
-                    "timestamp" to timestamp
-                )
+        // 🌟 終極殺招：避開 Android 檔案權限，直接把圖片轉成位元組 (Bytes) 從記憶體上傳！
+        try {
+            val inputStream = contentResolver.openInputStream(uri)
+            val data = inputStream?.readBytes()
+            inputStream?.close()
 
-                // 3. 將圖片網址寫入 Firestore 建立相簿紀錄
-                db.collection(email).document("去背相簿").collection("images").document(timestamp.toString())
-                    .set(data)
-                    .addOnSuccessListener {
-                        progressBar.visibility = View.GONE
-                        btnSaveImage.text = "儲存成功！"
-                        Toast.makeText(this, "已儲存至專屬去背相簿！", Toast.LENGTH_SHORT).show()
-                    }
+            if (data == null) {
+                Toast.makeText(this, "無法讀取圖片資料", Toast.LENGTH_SHORT).show()
+                progressBar.visibility = View.GONE
+                btnSaveImage.isEnabled = true
+                return
             }
-        }.addOnFailureListener {
+
+            // 改用 putBytes(data) 進行上傳
+            storageRef.putBytes(data).addOnSuccessListener {
+                storageRef.downloadUrl.addOnSuccessListener { downloadUrl ->
+                    val db = FirebaseFirestore.getInstance()
+                    val mapData = hashMapOf(
+                        "imageUrl" to downloadUrl.toString(),
+                        "timestamp" to timestamp
+                    )
+
+                    db.collection(email).document("去背相簿").collection("images")
+                        .document(timestamp.toString())
+                        .set(mapData)
+                        .addOnSuccessListener {
+                            progressBar.visibility = View.GONE
+                            btnSaveImage.text = "儲存成功！"
+                            Toast.makeText(
+                                this@RemoveBgActivity,
+                                "已儲存至專屬去背相簿！",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                }.addOnFailureListener { exception ->
+                    progressBar.visibility = View.GONE
+                    btnSaveImage.isEnabled = true
+                    Toast.makeText(
+                        this@RemoveBgActivity,
+                        "取得網址失敗: ${exception.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }.addOnFailureListener { exception ->
+                progressBar.visibility = View.GONE
+                btnSaveImage.isEnabled = true
+                btnSaveImage.text = "儲存去背照片到相簿"
+                Toast.makeText(
+                    this@RemoveBgActivity,
+                    "上傳失敗: ${exception.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        } catch (e: Exception) {
             progressBar.visibility = View.GONE
             btnSaveImage.isEnabled = true
-            btnSaveImage.text = "儲存去背照片到相簿"
-            Toast.makeText(this, "上傳失敗，請檢查網路連線", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "讀取檔案失敗: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 }

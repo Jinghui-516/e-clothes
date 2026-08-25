@@ -21,10 +21,12 @@
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:adjustViewBounds="true"
-            android:src="@drawable/logo_login" /> <Space
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+            android:src="@drawable/logo_login" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <ImageView
             android:id="@+id/profile"
@@ -258,6 +260,20 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <!-- 🌟 進入「人形試穿」的懸浮按鈕 (安全放在最下層) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_fitting_room"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottom_navigation"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/ic_clothes"
+        app:backgroundTint="@color/brand_primary"
+        app:tint="@color/white"
+        app:elevation="6dp"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"

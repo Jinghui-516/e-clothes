@@ -25,10 +25,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
+import tw.edu.pu.csim.s1120336.e_fit.home
 import tw.edu.pu.csim.s1120336.e_fit.Match.*
 import tw.edu.pu.csim.s1120336.e_fit.R
 import tw.edu.pu.csim.s1120336.e_fit.clothes.Wardrobe
-import tw.edu.pu.csim.s1120336.e_fit.home
+import tw.edu.pu.csim.s1120336.e_fit.Setting
 
 class Personal_Page : AppCompatActivity() {
 
@@ -39,12 +40,12 @@ class Personal_Page : AppCompatActivity() {
     private lateinit var chipGroup: ChipGroup
     private lateinit var rvPersonalGrid: RecyclerView
     private lateinit var btnEditTags: ImageView
+    private lateinit var btnSettingsPage: ImageView
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val storage = FirebaseStorage.getInstance()
 
-    // 🌟 核心變數：儲存當前查看的 Email (預設為自己)
     private var targetEmail: String = ""
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -57,7 +58,6 @@ class Personal_Page : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_personal_page)
 
-        // 接收外部傳來的 Email，若沒傳則預設為自己
         targetEmail = intent.getStringExtra("TARGET_EMAIL") ?: auth.currentUser?.email ?: ""
 
         nameTextView = findViewById(R.id.nameTextView)
@@ -67,11 +67,17 @@ class Personal_Page : AppCompatActivity() {
         chipGroup = findViewById(R.id.chipGroup)
         rvPersonalGrid = findViewById(R.id.rv_personal_grid)
         btnEditTags = findViewById(R.id.btn_edit_tags)
+        btnSettingsPage = findViewById(R.id.btn_settings_page)
+
         rvPersonalGrid.layoutManager = GridLayoutManager(this, 3)
 
-        // 🌟 權限控制：只有查看自己頁面時才允許編輯
         val isMe = (targetEmail == auth.currentUser?.email)
         if (isMe) {
+            btnSettingsPage.visibility = View.VISIBLE
+            btnSettingsPage.setOnClickListener {
+                startActivity(Intent(this, Setting::class.java))
+            }
+
             circularImageView.setOnClickListener {
                 val intent = Intent(Intent.ACTION_PICK).apply { type = "image/*" }
                 pickImageLauncher.launch(intent)
@@ -81,23 +87,50 @@ class Personal_Page : AppCompatActivity() {
             birthdayTextView.setOnClickListener { showEditDialog("生日", "修改生日", birthdayTextView) }
             btnEditTags.setOnClickListener { startActivity(Intent(this, Edit_Label::class.java)) }
         } else {
-            // 查看他人檔案時，隱藏編輯按鈕
             btnEditTags.visibility = View.GONE
+            btnSettingsPage.visibility = View.GONE
         }
 
         fetchUserData(targetEmail)
         loadUserStyles(targetEmail)
-        fetchMyHistoryPosts(targetEmail)
+
+        // 🌟 把 isMe 傳遞進去，用來判斷能不能刪除
+        fetchMyHistoryPosts(targetEmail, isMe)
+
         setupNavigation()
     }
 
-    private fun fetchMyHistoryPosts(email: String) {
-        db.collection("AllPosts").whereEqualTo("userEmail", email)
+    // 🌟 修改：傳入 isMe，並且同時抓取貼文的 ID (用 Pair 包裝)
+    private fun fetchMyHistoryPosts(email: String, isMe: Boolean) {
+        db.collection("AllPosts")
+            .whereEqualTo("userEmail", email)
             .orderBy("timestamp", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, _ ->
-                val images = snapshot?.documents?.mapNotNull { it.get("imageUrls") as? List<*> }
-                    ?.filter { it.isNotEmpty() }?.map { it[0].toString() } ?: emptyList()
-                rvPersonalGrid.adapter = PersonalGridAdapter(images)
+            .addSnapshotListener { snapshot, error ->
+
+                if (error != null) {
+                    Toast.makeText(this@Personal_Page, "⚠️ 缺少Firebase排序索引，啟用備用讀取模式！", Toast.LENGTH_LONG).show()
+
+                    db.collection("AllPosts")
+                        .whereEqualTo("userEmail", email)
+                        .get()
+                        .addOnSuccessListener { fallbackSnapshot ->
+                            // 🌟 抓取 doc.id 和圖片網址
+                            val posts = fallbackSnapshot.documents.mapNotNull { doc ->
+                                val urls = doc.get("imageUrls") as? List<*>
+                                if (!urls.isNullOrEmpty()) Pair(doc.id, urls[0].toString()) else null
+                            }
+                            rvPersonalGrid.adapter = PersonalGridAdapter(posts, isMe)
+                        }
+                    return@addSnapshotListener
+                }
+
+                // 🌟 抓取 doc.id 和圖片網址
+                val posts = snapshot?.documents?.mapNotNull { doc ->
+                    val urls = doc.get("imageUrls") as? List<*>
+                    if (!urls.isNullOrEmpty()) Pair(doc.id, urls[0].toString()) else null
+                } ?: emptyList()
+
+                rvPersonalGrid.adapter = PersonalGridAdapter(posts, isMe)
             }
     }
 
@@ -174,12 +207,46 @@ class Personal_Page : AppCompatActivity() {
         }
     }
 
-    inner class PersonalGridAdapter(private val images: List<String>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    // 🌟 修改：接收 Pair 資料型態 (包含 docId 和圖片網址)，並接收 isMe 判斷權限
+    inner class PersonalGridAdapter(
+        private val posts: List<Pair<String, String>>,
+        private val isMe: Boolean
+    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             object : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_personal_grid, parent, false)) {}
+
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, pos: Int) {
-            Glide.with(holder.itemView.context).load(images[pos]).into(holder.itemView.findViewById(R.id.iv_grid_image))
+            val docId = posts[pos].first
+            val imageUrl = posts[pos].second
+
+            Glide.with(holder.itemView.context).load(imageUrl).into(holder.itemView.findViewById(R.id.iv_grid_image))
+
+            // 🌟 核心刪除邏輯：如果是自己的貼文，才開放長按刪除功能
+            if (isMe) {
+                holder.itemView.setOnLongClickListener {
+                    AlertDialog.Builder(this@Personal_Page)
+                        .setTitle("刪除貼文")
+                        .setMessage("確定要刪除這篇歷史穿搭嗎？刪除後無法恢復喔！")
+                        .setPositiveButton("確定刪除") { _, _ ->
+                            db.collection("AllPosts").document(docId).delete()
+                                .addOnSuccessListener {
+                                    Toast.makeText(this@Personal_Page, "貼文已刪除！", Toast.LENGTH_SHORT).show()
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(this@Personal_Page, "刪除失敗，請稍後再試", Toast.LENGTH_SHORT).show()
+                                }
+                        }
+                        .setNegativeButton("先留著", null)
+                        .show()
+                    true
+                }
+            } else {
+                // 如果是看別人的檔案，停用長按功能
+                holder.itemView.setOnLongClickListener(null)
+            }
         }
-        override fun getItemCount() = images.size
+
+        override fun getItemCount() = posts.size
     }
 }

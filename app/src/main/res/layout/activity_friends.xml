@@ -49,13 +49,14 @@
         android:padding="16dp"
         android:gravity="center_vertical">
 
+        <!-- 🌟 修改 1：將 ID 改為 et_search_username，並修改提示文字 (hint) -->
         <EditText
-            android:id="@+id/et_search_email"
+            android:id="@+id/et_search_username"
             android:layout_width="0dp"
             android:layout_height="45dp"
             android:layout_weight="1"
-            android:hint="輸入好友 Email 來搜尋"
-            android:background="@drawable/corners_login"
+            android:hint="輸入使用者名稱來搜尋..."
+            android:background="#F0F0F0"
             android:paddingHorizontal="12dp"
             android:textSize="14sp"/>
 
@@ -117,10 +118,11 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- 🌟 修改 2：抓到漏網之魚！將寫死的顏色換成 @color/divider_line -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#D1C9C6"/>
+        android:background="@color/divider_line"/>
 
     <TextView
         android:layout_width="wrap_content"

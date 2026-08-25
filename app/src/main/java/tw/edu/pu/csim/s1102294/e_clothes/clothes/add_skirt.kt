@@ -26,7 +26,7 @@ import tw.edu.pu.csim.s1120336.e_fit.R
 import tw.edu.pu.csim.s1120336.e_fit.Setting
 import tw.edu.pu.csim.s1120336.e_fit.home
 
-class add_shoes : AppCompatActivity() {
+class add_skirt : AppCompatActivity() {
 
     class ImageAdapter(
         private val context: Context,
@@ -142,12 +142,11 @@ class add_shoes : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_shoes)
-
+        // 🌟 修正 1：改為綁定 add_skirt 的畫面
+        setContentView(R.layout.activity_add_skirt)
 
         Home = findViewById(R.id.Home)
         Home.setOnClickListener {
-//            Home.text = ""
             val intent1 = Intent(this, home::class.java)
             startActivity(intent1)
             finish()
@@ -155,7 +154,6 @@ class add_shoes : AppCompatActivity() {
 
         Match = findViewById(R.id.Match)
         Match.setOnClickListener {
-//            Match.text = ""
             val intent2 = Intent(this, Match_home::class.java)
             startActivity(intent2)
             finish()
@@ -163,8 +161,6 @@ class add_shoes : AppCompatActivity() {
 
         Clothes = findViewById(R.id.Clothes)
         Clothes.setOnClickListener {
-//            textView9.text = "123"
-//            checkPermission()
             val intent = Intent(this, choose_add::class.java)
             startActivity(intent)
             finish()
@@ -194,14 +190,13 @@ class add_shoes : AppCompatActivity() {
         // 修改為使用 ContextThemeWrapper 來套用自訂樣式
         menu = findViewById(R.id.menu)
         menu.setOnClickListener {
-            // 使用 ContextThemeWrapper 應用自訂樣式
             val popupMenu = PopupMenu(ContextThemeWrapper(this, R.style.CustomPopupMenu), menu)
             popupMenu.inflate(R.menu.wardrobe_menu)
 
             popupMenu.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.manage_clothes -> {
-                        Toast.makeText(this, "管理所友衣服", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "管理所有衣服", Toast.LENGTH_SHORT).show()
                         val intent2 = Intent(this, Wardrobe::class.java)
                         startActivity(intent2)
                         finish()
@@ -210,7 +205,7 @@ class add_shoes : AppCompatActivity() {
                     else -> false
                 }
             }
-            popupMenu.show()  // 顯示 PopupMenu
+            popupMenu.show()
         }
 
         // Initialize RecyclerView
@@ -223,27 +218,27 @@ class add_shoes : AppCompatActivity() {
 
     private fun loadImagesFromFirestore() {
         val imageUrls = mutableListOf<String>()
-        val documentIds = mutableListOf<String>() // List to hold document IDs
+        val documentIds = mutableListOf<String>()
         val email = FirebaseAuth.getInstance().currentUser?.email
 
         if (!email.isNullOrEmpty()) {
-            firestore.collection(email) // Use email as the collection name
+            firestore.collection(email)
                 .get()
                 .addOnSuccessListener { documents ->
                     for (document in documents) {
-                        if (document.id.contains("鞋子")) { // Check if document ID contains "上衣"
+                        // 🌟 修正 2：這裡要改成「裙子」，才抓得到裙子的照片
+                        if (document.id.contains("裙子")) {
                             val imageUrl = document.getString("圖片網址")
                             if (!imageUrl.isNullOrEmpty()) {
                                 imageUrls.add(imageUrl)
-                                documentIds.add(document.id) // Add the document ID to the list
+                                documentIds.add(document.id)
                             } else {
                                 Log.d("Firestore", "Empty image URL found in document: ${document.id}")
                             }
                         }
                     }
 
-                    // Create and set the adapter with document IDs
-                    imageAdapter = add_shoes.ImageAdapter(this, imageUrls, documentIds)
+                    imageAdapter = add_skirt.ImageAdapter(this, imageUrls, documentIds)
                     recyclerView.adapter = imageAdapter
                     imageAdapter.notifyDataSetChanged()
                 }

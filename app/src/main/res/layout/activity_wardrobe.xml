@@ -56,16 +56,39 @@
             android:orientation="vertical"
             android:paddingBottom="24dp">
 
-            <TextView
-                android:layout_width="match_parent"
+            <!-- 🌟 全新升級：可點擊的切換標題區塊 -->
+            <LinearLayout
+                android:id="@+id/layout_title_selector"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="我的衣櫃"
-                android:textColor="@color/brand_primary"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingEnd="16dp">
+
+                <TextView
+                    android:id="@+id/tv_main_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="我的衣櫃"
+                    android:textColor="@color/brand_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <!-- 下拉小箭頭圖示 -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@android:drawable/arrow_down_float"
+                    app:tint="@color/brand_primary" />
+            </LinearLayout>
 
             <TextView
+                android:id="@+id/tv_subtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
@@ -74,39 +97,75 @@
                 android:textColor="@color/brand_secondary"
                 android:textSize="14sp" />
 
-            <TextView android:id="@+id/hat_txv" style="@style/WardrobeLabel" android:text="頭飾" />
-            <LinearLayout android:id="@+id/hat_layout" style="@style/WardrobeRow">
-                <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
-                    <LinearLayout android:id="@+id/imagesContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
-                </HorizontalScrollView>
+            <!-- ========================================== -->
+            <!-- 📦 包裹 A：我的衣櫃內容 (原封不動保留) -->
+            <!-- ========================================== -->
+            <LinearLayout
+                android:id="@+id/layout_wardrobe_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView android:id="@+id/hat_txv" style="@style/WardrobeLabel" android:text="頭飾" />
+                <LinearLayout android:id="@+id/hat_layout" style="@style/WardrobeRow">
+                    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+                        <LinearLayout android:id="@+id/imagesContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
+                    </HorizontalScrollView>
+                </LinearLayout>
+
+                <TextView android:id="@+id/dress_txv" style="@style/WardrobeLabel" android:text="洋裝" />
+                <LinearLayout android:id="@+id/dress_layout" style="@style/WardrobeRow">
+                    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+                        <LinearLayout android:id="@+id/dressimagesContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
+                    </HorizontalScrollView>
+                </LinearLayout>
+
+                <TextView android:id="@+id/clothes_txv" style="@style/WardrobeLabel" android:text="上衣" />
+                <LinearLayout android:id="@+id/clothes_layout" style="@style/WardrobeRow">
+                    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+                        <LinearLayout android:id="@+id/clothesimagesContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
+                    </HorizontalScrollView>
+                </LinearLayout>
+
+                <TextView android:id="@+id/pants_txv" style="@style/WardrobeLabel" android:text="褲子" />
+                <LinearLayout android:id="@+id/pants_layout" style="@style/WardrobeRow">
+                    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+                        <LinearLayout android:id="@+id/pantsimagesContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
+                    </HorizontalScrollView>
+                </LinearLayout>
+
+                <TextView android:id="@+id/skirt_txv" style="@style/WardrobeLabel" android:text="裙子" />
+                <LinearLayout android:id="@+id/skirt_layout" style="@style/WardrobeRow">
+                    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+                        <LinearLayout android:id="@+id/skirtimagesContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
+                    </HorizontalScrollView>
+                </LinearLayout>
+
+                <TextView android:id="@+id/shoes_txv" style="@style/WardrobeLabel" android:text="鞋子" />
+                <LinearLayout android:id="@+id/shoes_layout" style="@style/WardrobeRow">
+                    <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
+                        <LinearLayout android:id="@+id/shoesimagesContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
+                    </HorizontalScrollView>
+                </LinearLayout>
             </LinearLayout>
 
-            <TextView android:id="@+id/dress_txv" style="@style/WardrobeLabel" android:text="洋裝" />
-            <LinearLayout android:id="@+id/dress_layout" style="@style/WardrobeRow">
-                <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
-                    <LinearLayout android:id="@+id/dressimagesContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
-                </HorizontalScrollView>
-            </LinearLayout>
+            <!-- ========================================== -->
+            <!-- 📦 包裹 B：我的搭配內容 (預設隱藏) -->
+            <!-- ========================================== -->
+            <LinearLayout
+                android:id="@+id/layout_outfits_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
 
-            <TextView android:id="@+id/clothes_txv" style="@style/WardrobeLabel" android:text="上衣" />
-            <LinearLayout android:id="@+id/clothes_layout" style="@style/WardrobeRow">
-                <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
-                    <LinearLayout android:id="@+id/clothesimagesContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
-                </HorizontalScrollView>
-            </LinearLayout>
-
-            <TextView android:id="@+id/pants_txv" style="@style/WardrobeLabel" android:text="褲子" />
-            <LinearLayout android:id="@+id/pants_layout" style="@style/WardrobeRow">
-                <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
-                    <LinearLayout android:id="@+id/pantsimagesContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
-                </HorizontalScrollView>
-            </LinearLayout>
-
-            <TextView android:id="@+id/shoes_txv" style="@style/WardrobeLabel" android:text="鞋子" />
-            <LinearLayout android:id="@+id/shoes_layout" style="@style/WardrobeRow">
-                <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:scrollbars="none">
-                    <LinearLayout android:id="@+id/shoesimagesContainer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" />
-                </HorizontalScrollView>
+                <!-- 準備接模特兒搭配照的網格 -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_outfits_grid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:nestedScrollingEnabled="false" />
             </LinearLayout>
 
         </LinearLayout>

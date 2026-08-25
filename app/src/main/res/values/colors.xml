@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="brand_primary">#6E5549</color>
-    <color name="brand_secondary">#9B8579</color>
+    <!-- 🌟 主視覺色：全部換成妳最愛的「灰霧藍」 -->
+    <color name="brand_primary">#8FA4B5</color>
+    <color name="brand_secondary">#A0B0BD</color>
+
+    <!-- 🌟 背景色：保持純淨白 -->
     <color name="brand_background">#FFFFFF</color>
-    <color name="divider_line">#E8DFD8</color>
-    <color name="chat_bubble_right">#D5C5BC</color>
-    <color name="chat_bubble_left">#E2D6CE</color>
-    <color name="text_primary">#6E5549</color>
-    <color name="text_hint">#B0A39C</color>
+
+    <!-- 分隔線：換成極淺的冷灰色，避免咖啡色殘留 -->
+    <color name="divider_line">#F0F4F7</color>
+
+    <!-- 💬 聊天室氣泡 (如果妳們有聊天介面的話) -->
+    <color name="chat_bubble_right">#8FA4B5</color> <!-- 自己的訊息：灰霧藍 -->
+    <color name="chat_bubble_left">#F9F9F9</color>  <!-- 對方的訊息：極簡白/淺灰 -->
+
+    <!-- ✍️ 文字顏色：為了閱讀清晰，使用同色系最深的「深海靜藍」 -->
+    <color name="text_primary">#556A7F</color>
+    <color name="text_hint">#C4D5DD</color>
+
+    <!-- 系統預設黑白 -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

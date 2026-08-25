@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/brand_primary"
     android:orientation="vertical"
-    tools:context=".clothes.add_hat">
+    tools:context=".clothes.add_skirt">
 
     <!-- Existing header layout -->
     <LinearLayout
@@ -61,7 +61,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="上衣"
+                    android:text="裙子"
                     android:textSize="20dp" />
 
                 <TextView

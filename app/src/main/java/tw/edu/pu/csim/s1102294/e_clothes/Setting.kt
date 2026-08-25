@@ -1,149 +1,120 @@
 package tw.edu.pu.csim.s1120336.e_fit
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
+import android.view.View
+import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.PopupMenu
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import com.google.firebase.auth.EmailAuthProvider
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
-import com.google.firebase.auth.FirebaseUser
-import tw.edu.pu.csim.s1120336.e_fit.Community.Liked_Post
-//import tw.edu.pu.csim.s1120336.e_fit.Community.Liked_Post
-import tw.edu.pu.csim.s1120336.e_fit.Match.edit_Chosen_Match
-import tw.edu.pu.csim.s1120336.e_fit.Match.edit_Profile
-import tw.edu.pu.csim.s1120336.e_fit.Match.share_Match
-import tw.edu.pu.csim.s1120336.e_fit.R
+import com.google.firebase.firestore.FirebaseFirestore // 🌟 新增 Firestore 資料庫的匯入
+
 class Setting : AppCompatActivity() {
 
-    lateinit var btn_Delete: Button
-    lateinit var Sign_out: Button
-    lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var btnBack: ImageView
+    private lateinit var layoutChangePassword: LinearLayout
+    private lateinit var layoutLogout: LinearLayout
+    private lateinit var layoutDeleteAccount: LinearLayout
+
+    // 對話框元件
+    private lateinit var dialogDeleteOverlay: FrameLayout
+    private lateinit var btnCancelDelete: TextView
+    private lateinit var btnConfirmDelete: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
 
+        // 綁定元件
+        btnBack = findViewById(R.id.btn_back)
+        layoutChangePassword = findViewById(R.id.layout_change_password)
+        layoutLogout = findViewById(R.id.layout_logout)
+        layoutDeleteAccount = findViewById(R.id.layout_delete_account)
 
-        btn_Delete = findViewById(R.id.btn_Delete)
+        dialogDeleteOverlay = findViewById(R.id.dialog_delete_overlay)
+        btnCancelDelete = findViewById(R.id.btn_cancel_delete)
+        btnConfirmDelete = findViewById(R.id.btn_confirm_delete)
 
-        val menu = findViewById<ImageView>(R.id.menu)
-        menu.setOnClickListener {
-            val popup = PopupMenu(this, menu)
-            popup.menuInflater.inflate(R.menu.menu_share, popup.menu)
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.add -> {
-                        Toast.makeText(this, "編輯個人資料", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, edit_Profile::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    R.id.check -> {
-                        Toast.makeText(this, "編輯精選穿搭", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, edit_Chosen_Match::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    R.id.share -> {
-                        Toast.makeText(this, "分享搭配", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, share_Match::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    R.id.like -> {
-                        Toast.makeText(this, "喜歡的貼文", Toast.LENGTH_SHORT).show()
-                        val intent3 = Intent(this, Liked_Post::class.java)
-                        startActivity(intent3)
-                        finish()
-                        true
-                    }
-                    R.id.settings -> {
-                        Toast.makeText(this, "設定", Toast.LENGTH_SHORT).show()
-                        val intent2 = Intent(this, Setting::class.java)
-                        startActivity(intent2)
-                        finish()
-                        true
-                    }
-                    else -> false
-                }
-            }
-            popup.show()
+        // 1. 返回上一頁
+        btnBack.setOnClickListener {
+            finish()
         }
 
-
-        firebaseAuth = FirebaseAuth.getInstance()
-
-        Sign_out = findViewById(R.id.Sign_out)
-        Sign_out.setOnClickListener {
-            logoutUser()
+        // 2. 跳轉至修改密碼頁面
+        layoutChangePassword.setOnClickListener {
+            val intent = Intent(this, change_password::class.java)
+            startActivity(intent)
         }
 
-        btn_Delete.setOnClickListener {
-            AlertDialog.Builder(this@Setting)
-                .setTitle("title")
-                .setMessage("確定刪掉本帳號嗎?")
-                .setPositiveButton("否") { dialog, _ ->
-                    // 可以在这里处理确定按钮的点击事件
-                    dialog.dismiss()
-                }
-                .setNegativeButton("是") { dialog, _ ->
-                    // 可以在这里处理取消按钮的点击事件
-                    AlertDialog.Builder(this)
-                        .setTitle("title")
-                        .setMessage("刪除後將無法復原!!")
-                        .setPositiveButton("否") { dialog2, _ ->
+        // 3. 登出帳號
+        layoutLogout.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            Toast.makeText(this, "已登出 e-fit 帳號", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, login::class.java)
+            // 清除之前的 Activity 堆疊，避免按返回鍵又回到登入狀態
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        }
 
-                            dialog2.dismiss()
+        // 4. 點擊刪除帳號，顯示專屬對話框
+        layoutDeleteAccount.setOnClickListener {
+            dialogDeleteOverlay.visibility = View.VISIBLE
+        }
+
+        // 5. 取消刪除 (隱藏對話框)
+        btnCancelDelete.setOnClickListener {
+            dialogDeleteOverlay.visibility = View.GONE
+        }
+
+        // 6. 確定刪除 (🌟 升級版：先刪除發布過的貼文，再刪除帳號)
+        btnConfirmDelete.setOnClickListener {
+            val user = FirebaseAuth.getInstance().currentUser
+            val email = user?.email
+            val db = FirebaseFirestore.getInstance()
+
+            if (user != null && email != null) {
+                // 將按鈕文字改成提示狀態，並暫時停用按鈕，避免使用者狂按
+                btnConfirmDelete.text = "資料清除中..."
+                btnConfirmDelete.isEnabled = false
+
+                // 步驟一：先去 AllPosts 集合裡，找出所有 userEmail 是自己的貼文
+                db.collection("AllPosts").whereEqualTo("userEmail", email).get()
+                    .addOnSuccessListener { documents ->
+                        // 迴圈把找到的貼文一篇一篇刪掉
+                        for (document in documents) {
+                            db.collection("AllPosts").document(document.id).delete()
                         }
-                        .setNegativeButton("是") { dialog2, _ ->
-                            dialog2.dismiss()
-                            deleteAccount()
-                            val intent = Intent(this, login::class.java) // 更換為您的目標Activity
-                            startActivity(intent)
+
+                        // 步驟二：貼文刪乾淨後，正式刪除 Firebase Auth 帳號
+                        user.delete().addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                Toast.makeText(this, "帳號與相關貼文已成功刪除", Toast.LENGTH_SHORT).show()
+                                val intent = Intent(this, login::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
+                                finish()
+                            } else {
+                                // 若距離上次登入太久，Firebase 可能會要求重新驗證
+                                Toast.makeText(this, "刪除失敗，請重新登入後再試", Toast.LENGTH_LONG).show()
+                                dialogDeleteOverlay.visibility = View.GONE
+                                btnConfirmDelete.text = "確定刪除"
+                                btnConfirmDelete.isEnabled = true
+                            }
                         }
-                        .show()
-                    dialog.dismiss()
-                }
-                .show()
-        }
-    }
-    private fun logoutUser() {
-        // 使用 Firebase 身分驗證進行登出
-        firebaseAuth.signOut()
-        // 轉到 Login
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
-
-    private fun deleteAccount() {
-        val user = FirebaseAuth.getInstance().currentUser
-
-        user?.let {
-            // 刪除帳號
-            it.delete().addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Toast.makeText(this, "帳號已刪除", Toast.LENGTH_SHORT).show()
-                    Log.d("DeleteAccount", "User account deleted.")
-                    // 帳號刪除後，可以重定向到登入頁面或其他頁面
-                } else {
-                    // 如果需要重新驗證
-                    Toast.makeText(this, "帳號刪除失敗，可能需要重新驗證", Toast.LENGTH_SHORT).show()
-                    Log.e("DeleteAccount", "Failed to delete user", task.exception)
-                }
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "清除貼文時發生錯誤，請稍後再試", Toast.LENGTH_SHORT).show()
+                        dialogDeleteOverlay.visibility = View.GONE
+                        btnConfirmDelete.text = "確定刪除"
+                        btnConfirmDelete.isEnabled = true
+                    }
+            } else {
+                Toast.makeText(this, "無法取得使用者資訊，請重新登入", Toast.LENGTH_SHORT).show()
             }
-        } ?: run {
-            // 如果當前沒有使用者登入
-            Toast.makeText(this, "尚未登入", Toast.LENGTH_SHORT).show()
         }
     }
 }

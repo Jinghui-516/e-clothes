@@ -17,6 +17,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+
 import tw.edu.pu.csim.s1120336.e_fit.Community.Friends // 🌟 補上 Friends 匯入
 import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
 import tw.edu.pu.csim.s1120336.e_fit.R

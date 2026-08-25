@@ -21,7 +21,7 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
-            app:tint="#745E4D" />
+            app:tint="#556A7F" />
 
         <TextView
             android:layout_width="0dp"
@@ -29,7 +29,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="編輯標籤"
-            android:textColor="#745E4D"
+            android:textColor="#556A7F"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -38,7 +38,7 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:src="@android:drawable/ic_menu_add"
-            app:tint="#745E4D" />
+            app:tint="#556A7F" />
     </LinearLayout>
 
     <View
@@ -86,14 +86,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="服裝分類"
-                    android:textColor="#333333"
+                    android:textColor="#556A7F"
                     android:textSize="18sp" />
                 <TextView
                     android:id="@+id/Classification_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="上衣"
-                    android:textColor="#745E4D"
+                    android:textColor="#556A7F"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:layout_marginEnd="10dp"/>
@@ -101,7 +101,7 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@android:drawable/ic_media_next"
-                    app:tint="#745E4D" />
+                    app:tint="#556A7F" />
             </LinearLayout>
 
             <View
@@ -113,7 +113,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="輸入標籤名稱："
-                android:textColor="#333333"
+                android:textColor="#556A7F"
                 android:textSize="16sp"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="12dp" />
@@ -143,15 +143,15 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="手寫標籤..."
-                    android:textColor="#333333"
-                    android:backgroundTint="#745E4D" />
+                    android:textColor="#556A7F"
+                    android:backgroundTint="#556A7F" />
 
                 <ImageView
                     android:id="@+id/add_label"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:src="@android:drawable/ic_input_add"
-                    app:tint="#745E4D" />
+                    app:tint="#556A7F" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -168,7 +168,7 @@
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:background="#FFFFFF"
-        app:itemIconTint="#745E4D"
+        app:itemIconTint="#556A7F"
         app:itemIconSize="28dp"
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/bottom_nav_menu"

@@ -44,7 +44,7 @@ class Friends : AppCompatActivity() {
         val btnBack = findViewById<ImageView>(R.id.btn_back)
         btnBack.setOnClickListener { finish() }
 
-        etSearch = findViewById(R.id.et_search_email)
+        etSearch = findViewById(R.id.et_search_username)
         btnSearch = findViewById(R.id.btn_search)
         cardResult = findViewById(R.id.card_search_result)
         tvResultName = findViewById(R.id.tv_result_name)

@@ -10,11 +10,11 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import org.w3c.dom.Text
+
 import tw.edu.pu.csim.s1120336.e_fit.Community.Liked_Post
 import tw.edu.pu.csim.s1120336.e_fit.R
 import tw.edu.pu.csim.s1120336.e_fit.Setting
 import tw.edu.pu.csim.s1120336.e_fit.home
-
 class edit_Chosen_Match : AppCompatActivity(), GestureDetector.OnGestureListener {
 
     lateinit var Home: ImageView

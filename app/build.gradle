@@ -8,7 +8,8 @@ plugins {
 
 android {
     namespace 'tw.edu.pu.csim.s1120336.e_fit'
-    compileSdk 34 // 建議設為 34 或 35，相容性較好
+    compileSdk 36
+    // 建議設為 34 或 35，相容性較好
 
     defaultConfig {
         applicationId "tw.edu.pu.csim.s1120336.e_fit"
@@ -65,6 +66,7 @@ dependencies {
 
     // 圖片加載 (Glide)
     implementation 'com.github.bumptech.glide:glide:4.15.0'
+    implementation libs.androidx.activity
     kapt 'com.github.bumptech.glide:compiler:4.15.0'
 
     // 網路請求

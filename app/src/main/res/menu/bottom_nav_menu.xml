@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item
         android:id="@+id/nav_weather"
-        android:icon="@android:drawable/ic_menu_today"
+        android:icon="@drawable/ic_weather"
         android:title="天氣" />
 
     <item
         android:id="@+id/nav_wardrobe"
-        android:icon="@android:drawable/ic_menu_gallery"
-        android:title="電子衣櫃" />
+        android:icon="@drawable/ic_wardrobe"
+        android:title="衣櫃" />
 
     <item
         android:id="@+id/nav_community"
-        android:icon="@android:drawable/ic_menu_share"
+        android:icon="@drawable/ic_community"
         android:title="社群" />
 
     <item
         android:id="@+id/nav_rank"
-        android:icon="@android:drawable/ic_menu_sort_by_size"
-        android:title="排行榜" />
+        android:icon="@drawable/ic_rank"
+        android:title="排行" />
 
     <item
         android:id="@+id/nav_profile"
-        android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="個人檔案" />
+        android:icon="@drawable/ic_profile"
+        android:title="個人" />
+
 </menu>

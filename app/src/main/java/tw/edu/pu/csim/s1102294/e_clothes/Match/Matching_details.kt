@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.ImageView
 import com.bumptech.glide.Glide // Or your preferred image loading library
 import com.google.firebase.auth.FirebaseAuth
+
 import tw.edu.pu.csim.s1120336.e_fit.Community.Friends
 import tw.edu.pu.csim.s1120336.e_fit.Setting
 import tw.edu.pu.csim.s1120336.e_fit.clothes.choose_add
