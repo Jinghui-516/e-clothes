@@ -27,7 +27,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="我的去背作品集"
-            android:textColor="@color/brand_primary"
+            android:textColor="#556A7F"
             android:textSize="18sp"
             android:textStyle="bold" />
 

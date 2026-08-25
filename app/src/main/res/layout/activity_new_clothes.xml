@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="@color/brand_background"
     tools:context=".clothes.New_clothes">
 
+    <!-- 頂部標題列 -->
     <LinearLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
@@ -14,14 +15,14 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
-        android:background="#FFFFFF">
+        android:background="@color/brand_background">
 
         <ImageView
             android:id="@+id/previous"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
-            app:tint="#556A7F" />
+            app:tint="@color/text_primary" />
 
         <TextView
             android:layout_width="0dp"
@@ -29,7 +30,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="編輯標籤"
-            android:textColor="#556A7F"
+            android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -38,7 +39,7 @@
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:src="@android:drawable/ic_menu_add"
-            app:tint="#556A7F" />
+            app:tint="@color/text_primary" />
     </LinearLayout>
 
     <View
@@ -46,8 +47,9 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@id/header_layout"
-        android:background="#F0F0F0" />
+        android:background="@color/divider_line" />
 
+    <!-- 內容滾動區 -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -60,6 +62,7 @@
             android:orientation="vertical"
             android:padding="20dp">
 
+            <!-- 衣物照片 -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="350dp"
@@ -75,47 +78,102 @@
                     android:src="@drawable/gallery" />
             </androidx.cardview.widget.CardView>
 
+            <!-- 1. 服裝分類 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:layout_marginTop="20dp">
+
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="服裝分類"
-                    android:textColor="#556A7F"
+                    android:textColor="@color/text_primary"
                     android:textSize="18sp" />
+
                 <TextView
                     android:id="@+id/Classification_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="上衣"
-                    android:textColor="#556A7F"
+                    android:textColor="@color/text_primary"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:layout_marginEnd="10dp"/>
+
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@android:drawable/ic_media_next"
-                    app:tint="#556A7F" />
+                    app:tint="@color/text_primary" />
             </LinearLayout>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#F5F5F5" />
+                android:background="@color/divider_line"
+                android:layout_marginBottom="16dp"/>
 
+            <!-- 🌟 2. 新增：AI 需要的【適合情境】 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="適合情境 (AI 推薦參考)："
+                android:textColor="@color/brand_primary"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp"/>
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:flexWrap="wrap"
+                android:layout_marginBottom="16dp">
+                <CheckBox android:id="@+id/cb_work" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="💼 職場" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
+                <CheckBox android:id="@+id/cb_school" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🏫 校園" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
+                <CheckBox android:id="@+id/cb_casual" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="☕ 休閒" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
+                <CheckBox android:id="@+id/cb_sport" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🌲 運動" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
+                <CheckBox android:id="@+id/cb_special" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🎉 特殊" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <!-- 🌟 3. 新增：AI 判斷天氣需要的【適合氣溫】 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="適合氣溫 (AI 天氣判斷)："
+                android:textColor="@color/brand_primary"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp"/>
+
+            <RadioGroup
+                android:id="@+id/rg_season"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+                <RadioButton android:id="@+id/rb_hot" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="☀️ 炎熱(薄)" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary" android:layout_weight="1"/>
+                <RadioButton android:id="@+id/rb_warm" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⛅ 涼爽(中)" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary" android:layout_weight="1"/>
+                <RadioButton android:id="@+id/rb_cold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="❄️ 寒冷(厚)" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary" android:layout_weight="1"/>
+            </RadioGroup>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider_line"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- 4. 原本的風格標籤 (保留妳的設計) -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="輸入標籤名稱："
-                android:textColor="#556A7F"
+                android:text="服裝風格："
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
                 android:textSize="16sp"
-                android:layout_marginTop="20dp"
                 android:layout_marginBottom="12dp" />
 
             <com.google.android.flexbox.FlexboxLayout
@@ -130,6 +188,7 @@
                 <Button android:id="@+id/formal" style="@style/TagButtonStyle" android:text="正式" />
             </com.google.android.flexbox.FlexboxLayout>
 
+            <!-- 手寫標籤輸入 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -142,16 +201,16 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:hint="手寫標籤..."
-                    android:textColor="#556A7F"
-                    android:backgroundTint="#556A7F" />
+                    android:hint="手寫新增其他標籤..."
+                    android:textColor="@color/text_primary"
+                    android:backgroundTint="@color/brand_primary" />
 
                 <ImageView
                     android:id="@+id/add_label"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:src="@android:drawable/ic_input_add"
-                    app:tint="#556A7F" />
+                    app:tint="@color/text_primary" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -159,16 +218,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:paddingBottom="100dp" /> </LinearLayout>
+                android:paddingBottom="100dp" />
+
+        </LinearLayout>
     </ScrollView>
 
+    <!-- 底部導覽列 -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
-        android:background="#FFFFFF"
-        app:itemIconTint="#556A7F"
+        android:background="@color/brand_background"
+        app:itemIconTint="@color/text_primary"
         app:itemIconSize="28dp"
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/bottom_nav_menu"

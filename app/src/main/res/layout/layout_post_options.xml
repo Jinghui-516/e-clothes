@@ -18,7 +18,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="分享你的穿搭"
-        android:textColor="@color/brand_primary"
+        android:textColor="#556A7F"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginBottom="24dp" />
@@ -27,7 +27,7 @@
         android:id="@+id/option_photo"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:background="@drawable/corners_login"
+        android:background="@color/white"
         android:backgroundTint="@color/white"
         android:gravity="center_vertical"
         android:paddingHorizontal="20dp"
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="選取手機照片"
-            android:textColor="@color/brand_primary"
+            android:textColor="#556A7F"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -55,7 +55,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:background="@drawable/corners_login"
-        android:backgroundTint="@color/brand_primary"
+        android:backgroundTint="@color/white"
         android:gravity="center_vertical"
         android:paddingHorizontal="20dp"
         android:layout_marginBottom="10dp"
@@ -66,14 +66,14 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@android:drawable/ic_menu_edit"
-            app:tint="@color/white" />
+            app:tint="@color/brand_primary" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="直接撰寫文案"
-            android:textColor="@color/white"
+            android:textColor="#556A7F"
             android:textSize="16sp" />
     </LinearLayout>
 </LinearLayout>

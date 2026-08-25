@@ -13,6 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="120dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/user" />
+        android:src="@drawable/ic_default_user" />
 
 </com.google.android.material.card.MaterialCardView>

@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:text="取消"
-            android:textColor="@color/text_primary"
+            android:textColor="#556A7F"
             android:textSize="16sp" />
 
         <TextView
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="新貼文"
-            android:textColor="@color/text_primary"
+            android:textColor="#556A7F"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -39,7 +39,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:text="分享"
-            android:textColor="@color/brand_primary"
+            android:textColor="#556A7F"
             android:textSize="16sp"
             android:textStyle="bold" />
     </RelativeLayout>

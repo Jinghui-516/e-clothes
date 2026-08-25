@@ -32,7 +32,7 @@ import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
 import tw.edu.pu.csim.s1120336.e_fit.FittingRoomActivity
 import tw.edu.pu.csim.s1120336.e_fit.Match.Match
 import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
-import tw.edu.pu.csim.s1120336.e_fit.Match.Matching_details
+
 import tw.edu.pu.csim.s1120336.e_fit.Match.Rank
 import tw.edu.pu.csim.s1120336.e_fit.clothes.Wardrobe
 import tw.edu.pu.csim.s1120336.e_fit.weather.RetrofitClient
@@ -67,9 +67,10 @@ class home : AppCompatActivity() {
                 Glide.with(itemView.context).load(match.鞋子圖片網址).into(shoesImageView)
 
                 itemView.setOnClickListener {
-                    val intent = Intent(itemView.context, Matching_details::class.java)
-                    intent.putExtra("matchData", match)
-                    itemView.context.startActivity(intent)
+                    // 暫時封印，等之後建好 Matching_details 頁面再打開
+                    // val intent = Intent(itemView.context, Matching_details::class.java)
+                    // intent.putExtra("matchData", match)
+                    // itemView.context.startActivity(intent)
                 }
             }
         }

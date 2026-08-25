@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/brand_background"
     android:orientation="vertical">
 
     <!-- 朋友的頭貼圖片 -->
@@ -21,7 +22,8 @@
             android:scaleType="centerCrop"
             android:src="@drawable/ic_launcher_foreground"
             app:shapeAppearanceOverlay="@style/CircularImageView"
-            app:strokeColor="@color/black" />
+            app:strokeColor="@color/brand_primary"
+            app:strokeWidth="1dp" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -36,37 +38,40 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Username"
-                android:textColor="@android:color/black"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <!-- 電子郵件 -->
+            <!-- 電子郵件 (或改成其他簡介) -->
             <TextView
                 android:id="@+id/friend_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="user@example.com"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="14sp" />
-
+                android:textColor="@color/brand_secondary"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp" />
 
         </LinearLayout>
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/Delete"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_gravity="center"
-                android:src="@drawable/trash"
-                app:shapeAppearanceOverlay="@style/CircularImageView" />
+        <!-- 垃圾桶圖示也加上主題色的 tint，讓它不突兀 -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/Delete"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center"
+            android:src="@drawable/trash"
+            app:tint="@color/brand_secondary"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:shapeAppearanceOverlay="@style/CircularImageView" />
     </LinearLayout>
 
-    <!-- 用戶名和電子郵件容器 -->
+    <!-- 分隔線換成我們設定好的極簡冷灰 -->
     <View
         android:id="@+id/view1"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginBottom="10dp"
-        android:background="#AAA09E" />
+        android:background="@color/divider_line" />
 
 </LinearLayout>

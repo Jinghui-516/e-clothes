@@ -23,7 +23,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:src="@drawable/ic_back"
-            app:tint="#6D5A5A" />
+            app:tint="#556A7F" />
 
         <TextView
             android:layout_width="0dp"
@@ -31,7 +31,7 @@
             android:layout_weight="1"
             android:text="設定"
             android:textAlignment="center"
-            android:textColor="#6D5A5A"
+            android:textColor="#556A7F"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -64,7 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="帳號與安全"
-            android:textColor="#8D7B68"
+            android:textColor="#556A7F"
             android:textSize="18sp"
             android:textStyle="bold" />
         <View
@@ -87,13 +87,13 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_secure"
-                app:tint="#8D7B68" />
+                app:tint="#556A7F" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:text="修改密碼"
-                android:textColor="#6D5A5A"
+                android:textColor="#556A7F"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -102,7 +102,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="隱私與通知"
-            android:textColor="#8D7B68"
+            android:textColor="#556A7F"
             android:textSize="18sp"
             android:textStyle="bold" />
         <View
@@ -124,14 +124,14 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_view"
-                app:tint="#8D7B68" />
+                app:tint="#556A7F" />
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:text="公開帳號"
-                android:textColor="#6D5A5A"
+                android:textColor="#556A7F"
                 android:textSize="16sp" />
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switch_public"
@@ -152,14 +152,14 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_popup_reminder"
-                app:tint="#8D7B68" />
+                app:tint="#556A7F" />
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_weight="1"
                 android:text="推播通知設定"
-                android:textColor="#6D5A5A"
+                android:textColor="#556A7F"
                 android:textSize="16sp" />
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switch_notification"
@@ -173,7 +173,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="帳號管理"
-            android:textColor="#8D7B68"
+            android:textColor="#556A7F"
             android:textSize="18sp"
             android:textStyle="bold" />
         <View
@@ -196,13 +196,13 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_myplaces"
-                app:tint="#8D7B68" />
+                app:tint="#556A7F" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:text="登出帳號"
-                android:textColor="#6D5A5A"
+                android:textColor="#556A7F"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -219,13 +219,13 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_delete"
-                app:tint="#8D7B68" />
+                app:tint="#556A7F" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:text="刪除帳號"
-                android:textColor="#6D5A5A"
+                android:textColor="#556A7F"
                 android:textSize="16sp" />
         </LinearLayout>
     </LinearLayout>
@@ -275,7 +275,7 @@
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="取消"
-                    android:textColor="#6D5A5A"
+                    android:textColor="#556A7F"
                     android:textSize="16sp" />
 
                 <!-- 中間分隔線 -->
