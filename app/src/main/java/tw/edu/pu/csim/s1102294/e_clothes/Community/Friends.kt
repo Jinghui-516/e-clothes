@@ -2,6 +2,7 @@ package tw.edu.pu.csim.s1120336.e_fit.Community
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +25,7 @@ class Friends : AppCompatActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
-    private var searchedEmail: String = "" // 記住搜到的 Email
+    private var searchedEmail: String = "" // 雖然用名稱搜，但背後還是記住 Email 才能加好友
 
     lateinit var etSearch: EditText
     lateinit var btnSearch: Button
@@ -34,7 +35,6 @@ class Friends : AppCompatActivity() {
     lateinit var btnAddFriend: Button
     lateinit var rvFriendsList: RecyclerView
 
-    // 資料結構：存放好友 Email、名字、頭貼
     data class FriendData(val email: String, val name: String, val avatar: String)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +45,8 @@ class Friends : AppCompatActivity() {
         btnBack.setOnClickListener { finish() }
 
         etSearch = findViewById(R.id.et_search_username)
+        etSearch.hint = "請輸入對方的使用者名稱..." // 🌟 提示改回使用者名稱
+
         btnSearch = findViewById(R.id.btn_search)
         cardResult = findViewById(R.id.card_search_result)
         tvResultName = findViewById(R.id.tv_result_name)
@@ -56,11 +58,11 @@ class Friends : AppCompatActivity() {
 
         // 1. 搜尋按鈕邏輯
         btnSearch.setOnClickListener {
-            val emailToSearch = etSearch.text.toString().trim()
-            if (emailToSearch.isNotEmpty()) {
-                searchUserInFirestore(emailToSearch)
+            val nameToSearch = etSearch.text.toString().trim()
+            if (nameToSearch.isNotEmpty()) {
+                searchUserInFirestore(nameToSearch) // 🌟 傳入使用者名稱
             } else {
-                Toast.makeText(this, "請輸入 Email", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "請輸入要搜尋的使用者名稱", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -73,52 +75,66 @@ class Friends : AppCompatActivity() {
         loadMyFriendsList()
     }
 
-    // 去雲端找這個 Email 的人存不存在
-    private fun searchUserInFirestore(email: String) {
+    // 🌟 全新升級：用「使用者名稱」跨資料夾搜尋
+    private fun searchUserInFirestore(searchName: String) {
         val myEmail = auth.currentUser?.email ?: return
-        if (email == myEmail) {
-            Toast.makeText(this, "不能加自己為好友啦！", Toast.LENGTH_SHORT).show()
-            return
-        }
 
-        db.collection(email).document("個人資料").get()
-            .addOnSuccessListener { doc ->
-                if (doc.exists()) {
-                    // 搜到了！顯示卡片
-                    searchedEmail = email
+        // 使用 collectionGroup 掃描全站所有的「個人資料」文件
+        db.collectionGroup("個人資料")
+            .whereEqualTo("使用者名稱", searchName)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    // 搜到了！(假設名稱不重複，我們取第一個結果)
+                    val doc = querySnapshot.documents[0]
+
+                    // 🌟 魔法步驟：從找到的文件路徑中，反向推導出這個人的 Email (資料夾名稱)
+                    val targetEmail = doc.reference.parent.id
+
+                    if (targetEmail == myEmail) {
+                        Toast.makeText(this, "不能加自己為好友啦！", Toast.LENGTH_SHORT).show()
+                        return@addOnSuccessListener
+                    }
+
+                    // 記錄對方的 Email 準備加好友，並顯示卡片
+                    searchedEmail = targetEmail
                     cardResult.visibility = View.VISIBLE
                     tvResultName.text = "@${doc.getString("使用者名稱") ?: "未設定"}"
+
                     val avatarUrl = doc.getString("頭貼圖片")
                     if (!avatarUrl.isNullOrEmpty()) {
                         Glide.with(this).load(avatarUrl).into(ivResultAvatar)
                     }
                 } else {
                     cardResult.visibility = View.GONE
-                    Toast.makeText(this, "找不到這個用戶喔！", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "找不到這個使用者名稱喔！", Toast.LENGTH_SHORT).show()
                 }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "搜尋失敗，請稍後再試", Toast.LENGTH_SHORT).show()
+                // 🌟 把真正的錯誤原因印在下方的 Logcat 裡面，裡面藏著建立索引的網址！
+                Log.e("SearchError", "Firebase 搜尋失敗原因 (請點擊網址建立索引): ", e)
             }
     }
 
-    // 把對方加入自己的好友名單，也把自己加入對方的好友名單 (雙向加好友)
+    // 雙向加好友 (保持原樣，因為底層還是用 Email 溝通)
     private fun addFriendToDatabase(friendEmail: String) {
         val myEmail = auth.currentUser?.email ?: return
 
-        // 用 Firebase 的 arrayUnion 把好友 Email 塞進 myFriends 陣列中
         db.collection(myEmail).document("friends")
             .set(hashMapOf("list" to FieldValue.arrayUnion(friendEmail)), com.google.firebase.firestore.SetOptions.merge())
             .addOnSuccessListener {
-                // 順便把自己的 Email 也塞進對方的名單裡
                 db.collection(friendEmail).document("friends")
                     .set(hashMapOf("list" to FieldValue.arrayUnion(myEmail)), com.google.firebase.firestore.SetOptions.merge())
 
                 Toast.makeText(this, "加好友成功！", Toast.LENGTH_SHORT).show()
                 cardResult.visibility = View.GONE
                 etSearch.text.clear()
-                loadMyFriendsList() // 刷新列表
+                loadMyFriendsList()
             }
     }
 
-    // 讀取好友清單並顯示
+    // 讀取好友清單
     private fun loadMyFriendsList() {
         val myEmail = auth.currentUser?.email ?: return
         db.collection(myEmail).document("friends").get()
@@ -127,7 +143,6 @@ class Friends : AppCompatActivity() {
                     val friendsEmails = doc.get("list") as? List<String> ?: return@addOnSuccessListener
                     val friendsDataList = mutableListOf<FriendData>()
 
-                    // 針對每個 Email 去抓他們的名字跟頭貼
                     var fetchCount = 0
                     for (friendEmail in friendsEmails) {
                         db.collection(friendEmail).document("個人資料").get()
@@ -146,12 +161,11 @@ class Friends : AppCompatActivity() {
             }
     }
 
-    // 好友列表專用的 Adapter
+    // 好友列表 Adapter
     inner class FriendsAdapter(private val list: List<FriendData>) : RecyclerView.Adapter<FriendsAdapter.ViewHolder>() {
         inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
             val ivAvatar = v.findViewById<ImageView>(R.id.iv_friend_avatar)
             val tvName = v.findViewById<TextView>(R.id.tv_friend_name)
-            // 🌟 記得補上這個 ID，對應 item_friend.xml 裡的聊天圖示
             val btnChat = v.findViewById<ImageView>(R.id.btn_chat_icon)
         }
 
@@ -165,14 +179,12 @@ class Friends : AppCompatActivity() {
             holder.tvName.text = friend.name
             Glide.with(holder.itemView.context).load(friend.avatar).placeholder(R.drawable.user).into(holder.ivAvatar)
 
-            // 1. 點擊整列：跳轉到個人檔案
             holder.itemView.setOnClickListener {
                 val intent = Intent(this@Friends, tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page::class.java)
-                intent.putExtra("TARGET_EMAIL", friend.email) // 傳遞對方 Email
+                intent.putExtra("TARGET_EMAIL", friend.email)
                 startActivity(intent)
             }
 
-            // 2. 點擊聊天圖示：跳轉到聊天室
             holder.btnChat.setOnClickListener {
                 val intent = Intent(this@Friends, tw.edu.pu.csim.s1120336.e_fit.Match.ChatRoomActivity::class.java)
                 intent.putExtra("FRIEND_EMAIL", friend.email)

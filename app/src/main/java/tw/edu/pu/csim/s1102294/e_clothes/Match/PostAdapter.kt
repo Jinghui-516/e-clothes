@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
@@ -16,7 +17,6 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import tw.edu.pu.csim.s1120336.e_fit.R
 
-// 🌟 修正：這裡改成 MutableList，確保 Adapter 能正確接收並處理列表
 class PostAdapter(private val postList: MutableList<Post>) : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
 
     private val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email ?: ""
@@ -36,6 +36,7 @@ class PostAdapter(private val postList: MutableList<Post>) : RecyclerView.Adapte
         val tvViewAllComments: TextView = v.findViewById(R.id.tv_view_all_comments)
         val tvCommentPreview1: TextView = v.findViewById(R.id.tv_comment_preview_1)
         val tvCommentPreview2: TextView = v.findViewById(R.id.tv_comment_preview_2)
+        val btnBookmark: ImageView = v.findViewById(R.id.btn_post_bookmark) // 🌟 珍藏按鈕
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -53,6 +54,7 @@ class PostAdapter(private val postList: MutableList<Post>) : RecyclerView.Adapte
         holder.viewPager.adapter = ImageSliderAdapter(post.imageUrls)
         TabLayoutMediator(holder.tabLayout, holder.viewPager) { _, _ -> }.attach()
 
+        // 🌟 點讚邏輯
         val isLiked = post.likedBy.contains(currentUserEmail)
         holder.btnLike.setImageResource(if (isLiked) R.drawable.ic_clothes else R.drawable.ic_hanger)
         holder.tvLikesCount.text = post.likedBy.size.toString()
@@ -71,6 +73,51 @@ class PostAdapter(private val postList: MutableList<Post>) : RecyclerView.Adapte
             }
         }
 
+        // 🌟 珍藏邏輯 (查詢狀態、切換圖示、取消與加入)
+        val postImageUrl = post.imageUrls.firstOrNull()
+        if (postImageUrl != null && currentUserEmail.isNotEmpty()) {
+            val collectionRef = db.collection(currentUserEmail).document("我的珍藏").collection("items")
+
+            // 1. 每次載入貼文時，先去資料庫查這張圖是不是已經被珍藏過
+            collectionRef.whereEqualTo("imageUrl", postImageUrl).get().addOnSuccessListener { snapshot ->
+                var isBookmarked = !snapshot.isEmpty
+                var savedDocId = if (isBookmarked) snapshot.documents.first().id else null
+
+                // 設定初始圖示 (假設填滿的圖示叫做 ic_bookmark_filled)
+                holder.btnBookmark.setImageResource(if (isBookmarked) R.drawable.ic_bookmark_filled else R.drawable.ic_bookmark)
+
+                // 2. 處理點擊事件
+                holder.btnBookmark.setOnClickListener {
+                    holder.btnBookmark.isEnabled = false // 防連點
+
+                    if (isBookmarked && savedDocId != null) {
+                        // 已經珍藏了 -> 執行「取消珍藏」，並把圖示變回空心
+                        collectionRef.document(savedDocId!!).delete().addOnSuccessListener {
+                            isBookmarked = false
+                            savedDocId = null
+                            holder.btnBookmark.setImageResource(R.drawable.ic_bookmark)
+                            holder.btnBookmark.isEnabled = true
+                            Toast.makeText(holder.itemView.context, "已取消珍藏", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        // 還沒珍藏 -> 執行「加入珍藏」，並把圖示變成填滿
+                        val savedData = hashMapOf(
+                            "imageUrl" to postImageUrl,
+                            "timestamp" to com.google.firebase.Timestamp.now()
+                        )
+                        collectionRef.add(savedData).addOnSuccessListener { docRef ->
+                            isBookmarked = true
+                            savedDocId = docRef.id
+                            holder.btnBookmark.setImageResource(R.drawable.ic_bookmark_filled)
+                            holder.btnBookmark.isEnabled = true
+                            Toast.makeText(holder.itemView.context, "已成功加入珍藏！✨", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        }
+
+        // 🌟 留言邏輯
         holder.tvCommentsCount.text = post.commentCount.toString()
         holder.tvViewAllComments.visibility = if (post.commentCount > 0) View.VISIBLE else View.GONE
         holder.tvViewAllComments.text = "查看全部 ${post.commentCount} 則留言"

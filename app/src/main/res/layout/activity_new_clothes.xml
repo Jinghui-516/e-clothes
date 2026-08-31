@@ -78,7 +78,7 @@
                     android:src="@drawable/gallery" />
             </androidx.cardview.widget.CardView>
 
-            <!-- 1. 服裝分類 -->
+            <!-- 服裝分類 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -117,7 +117,7 @@
                 android:background="@color/divider_line"
                 android:layout_marginBottom="16dp"/>
 
-            <!-- 🌟 2. 新增：AI 需要的【適合情境】 -->
+            <!-- 1. 適合情境 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -132,14 +132,70 @@
                 android:layout_height="wrap_content"
                 app:flexWrap="wrap"
                 android:layout_marginBottom="16dp">
-                <CheckBox android:id="@+id/cb_work" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="💼 職場" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
-                <CheckBox android:id="@+id/cb_school" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🏫 校園" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
-                <CheckBox android:id="@+id/cb_casual" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="☕ 休閒" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
-                <CheckBox android:id="@+id/cb_sport" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🌲 運動" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
-                <CheckBox android:id="@+id/cb_special" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🎉 特殊" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
+                <CheckBox android:id="@+id/cb_work" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="💼 職場商務" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
+                <CheckBox android:id="@+id/cb_school" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🏫 校園日常" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
+                <CheckBox android:id="@+id/cb_casual" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="☕ 休閒娛樂" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
+                <CheckBox android:id="@+id/cb_sport" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🌲 戶外運動" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
+                <CheckBox android:id="@+id/cb_special" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🎉 特殊場合" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary"/>
             </com.google.android.flexbox.FlexboxLayout>
 
-            <!-- 🌟 3. 新增：AI 判斷天氣需要的【適合氣溫】 -->
+            <!-- 2. 服裝風格 -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="服裝風格："
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="8dp" />
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:flexWrap="wrap"
+                app:justifyContent="flex_start"
+                android:layout_marginBottom="16dp">
+                <Button android:id="@+id/handsome" style="@style/TagButtonStyle" android:text="帥氣" />
+                <Button android:id="@+id/cute" style="@style/TagButtonStyle" android:text="可愛" />
+                <Button android:id="@+id/daily" style="@style/TagButtonStyle" android:text="日常" />
+                <Button android:id="@+id/easy" style="@style/TagButtonStyle" android:text="輕鬆" />
+                <Button android:id="@+id/formal" style="@style/TagButtonStyle" android:text="正式" />
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <!-- 3. 自訂輸入框與提示 (🌟拿掉右邊小加號，並設定單行輸入) -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="💡 若無想要的情境或風格，可直接於下方自訂新增喔！"
+                android:textColor="#888888"
+                android:textSize="13sp"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="手寫新增特殊情境或標籤 (如：喜宴)..."
+                android:textColor="@color/text_primary"
+                android:backgroundTint="@color/brand_primary"
+                android:textSize="15sp"
+                android:layout_marginBottom="8dp"
+                android:inputType="text"
+                android:imeOptions="actionDone"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/labelRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider_line"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- 4. 適合氣溫 (移至最下方) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -154,71 +210,38 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
-                <RadioButton android:id="@+id/rb_hot" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="☀️ 炎熱(薄)" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary" android:layout_weight="1"/>
-                <RadioButton android:id="@+id/rb_warm" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="⛅ 涼爽(中)" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary" android:layout_weight="1"/>
-                <RadioButton android:id="@+id/rb_cold" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="❄️ 寒冷(厚)" android:buttonTint="@color/brand_primary" android:textColor="@color/text_primary" android:layout_weight="1"/>
-            </RadioGroup>
+                android:paddingBottom="100dp">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/divider_line"
-                android:layout_marginBottom="16dp"/>
-
-            <!-- 4. 原本的風格標籤 (保留妳的設計) -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="服裝風格："
-                android:textColor="@color/text_primary"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_marginBottom="12dp" />
-
-            <com.google.android.flexbox.FlexboxLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:flexWrap="wrap"
-                app:justifyContent="flex_start">
-                <Button android:id="@+id/handsome" style="@style/TagButtonStyle" android:text="帥氣" />
-                <Button android:id="@+id/cute" style="@style/TagButtonStyle" android:text="可愛" />
-                <Button android:id="@+id/daily" style="@style/TagButtonStyle" android:text="日常" />
-                <Button android:id="@+id/easy" style="@style/TagButtonStyle" android:text="輕鬆" />
-                <Button android:id="@+id/formal" style="@style/TagButtonStyle" android:text="正式" />
-            </com.google.android.flexbox.FlexboxLayout>
-
-            <!-- 手寫標籤輸入 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="bottom"
-                android:layout_marginTop="20dp">
-
-                <EditText
-                    android:id="@+id/label"
+                <RadioButton
+                    android:id="@+id/rb_hot"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="手寫新增其他標籤..."
+                    android:text="☀️ 炎熱(薄)\n28°C以上"
+                    android:buttonTint="@color/brand_primary"
                     android:textColor="@color/text_primary"
-                    android:backgroundTint="@color/brand_primary" />
+                    android:textSize="13sp"
+                    android:layout_weight="1"/>
 
-                <ImageView
-                    android:id="@+id/add_label"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:src="@android:drawable/ic_input_add"
-                    app:tint="@color/text_primary" />
-            </LinearLayout>
+                <RadioButton
+                    android:id="@+id/rb_warm"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="⛅ 涼爽(中)\n20~27°C"
+                    android:buttonTint="@color/brand_primary"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13sp"
+                    android:layout_weight="1"/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/labelRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:paddingBottom="100dp" />
+                <RadioButton
+                    android:id="@+id/rb_cold"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="❄️ 寒冷(厚)\n20°C以下"
+                    android:buttonTint="@color/brand_primary"
+                    android:textColor="@color/text_primary"
+                    android:textSize="13sp"
+                    android:layout_weight="1"/>
+            </RadioGroup>
 
         </LinearLayout>
     </ScrollView>

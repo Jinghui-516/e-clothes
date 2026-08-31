@@ -223,10 +223,10 @@
                 android:id="@+id/rv_recommended_clothes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:visibility="gone"
                 android:clipToPadding="false"
-                android:paddingBottom="16dp"/>
+                android:paddingBottom="50dp"
+                android:nestedScrollingEnabled="false"/>
 
         </LinearLayout>
     </LinearLayout>

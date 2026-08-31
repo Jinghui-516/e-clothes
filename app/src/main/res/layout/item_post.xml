@@ -101,6 +101,24 @@
                 android:textColor="#745E4D"
                 android:textSize="15sp"
                 android:textStyle="bold" />
+
+            <!-- 🌟 這個 View 是彈簧，負責把後面的珍藏按鈕推到最右邊 -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- 🌟 珍藏按鈕 -->
+            <ImageView
+                android:id="@+id/btn_post_bookmark"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_bookmark"
+                app:tint="#745E4D" />
         </LinearLayout>
 
         <LinearLayout

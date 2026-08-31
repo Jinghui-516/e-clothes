@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
@@ -26,7 +27,6 @@ import java.util.*
 
 class New_clothes : AppCompatActivity() {
 
-    // --- 內部類別與變數 ---
     class LabelAdapter(private val labels: MutableList<String>, private val onLabelLongPress: (Int) -> Unit) : RecyclerView.Adapter<LabelAdapter.LabelViewHolder>() {
         class LabelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val textView: TextView = itemView.findViewById(R.id.textView)
@@ -48,8 +48,6 @@ class New_clothes : AppCompatActivity() {
     private lateinit var firebaseHelper: FirebaseHelper
     private var selectedColor: String = "未指定"
     private var imageUrl: String? = null
-
-    // 🌟 接收作品集網址的變數
     private var portfolioImageUrl: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,54 +63,61 @@ class New_clothes : AppCompatActivity() {
         val finishBtn: ImageView = findViewById(R.id.finish)
         val previousBtn: ImageView = findViewById(R.id.previous)
 
-        // 2. 接收前一頁資料 (包含從作品集傳來的雲端網址)
         val imageUriString = intent.getStringExtra("selectedImageUri")
         val imageBitmap = intent.getParcelableExtra<Bitmap>("capturedPhoto")
-        portfolioImageUrl = intent.getStringExtra("portfolioImageUrl") // 🌟 接收作品集網址
+        portfolioImageUrl = intent.getStringExtra("portfolioImageUrl")
 
         val passedCategory = intent.getStringExtra("category")
         selectedColor = intent.getStringExtra("color") ?: "未指定"
 
-        // 3. 設定畫面初始值
         classificationTextView.text = passedCategory ?: "未分類"
         when {
-            // 🌟 如果是作品集來的，直接用 Glide 載入雲端圖片顯示在畫面上！
             portfolioImageUrl != null -> Glide.with(this).load(portfolioImageUrl).into(clothesImageView)
             imageUriString != null -> clothesImageView.setImageURI(Uri.parse(imageUriString))
             imageBitmap != null -> clothesImageView.setImageBitmap(imageBitmap)
         }
 
-        // 4. 底部導覽列設定
         val bottomNav: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNav.selectedItemId = R.id.nav_wardrobe
-        bottomNav.setOnItemSelectedListener { item -> true }
+        bottomNav.setOnItemSelectedListener { true }
 
-        // 5. 標籤快捷鍵
-        findViewById<Button>(R.id.handsome).setOnClickListener { labelInput.setText("帥氣") }
-        findViewById<Button>(R.id.cute).setOnClickListener { labelInput.setText("可愛") }
-        findViewById<Button>(R.id.daily).setOnClickListener { labelInput.setText("日常") }
+        findViewById<Button>(R.id.handsome).setOnClickListener { addTagDirectly("帥氣") }
+        findViewById<Button>(R.id.cute).setOnClickListener { addTagDirectly("可愛") }
+        findViewById<Button>(R.id.daily).setOnClickListener { addTagDirectly("日常") }
+        findViewById<Button>(R.id.easy).setOnClickListener { addTagDirectly("輕鬆") }
+        findViewById<Button>(R.id.formal).setOnClickListener { addTagDirectly("正式") }
 
-        // 6. 標籤 RecyclerView
         val rv = findViewById<RecyclerView>(R.id.labelRecyclerView)
         adapter = LabelAdapter(labelList) { showDeleteDialog(it) }
         rv.layoutManager = GridLayoutManager(this, 4)
         rv.adapter = adapter
 
-        findViewById<ImageView>(R.id.add_label).setOnClickListener {
-            if (labelInput.text.isNotEmpty()) {
-                val text = labelInput.text.toString()
-                labelList.add(text)
-                labelTexts.add(text)
-                adapter.notifyItemInserted(labelList.size - 1)
-                labelInput.text.clear()
+        // 🌟 貼心功能：如果使用者按手機鍵盤的「完成(Enter)」，也自動把字變成標籤 (方便一次打多個)
+        labelInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                val text = labelInput.text.toString().trim()
+                if (text.isNotEmpty()) {
+                    addTagDirectly(text)
+                    labelInput.text.clear()
+                }
+                true
+            } else {
+                false
             }
         }
 
-        // 7. 退出與完成
         previousBtn.setOnClickListener { finish() }
 
         finishBtn.setOnClickListener {
-            // 🌟 判斷：如果是作品集照片，直接秒寫入資料庫；否則執行傳統的 Bitmap 上傳
+            // 🌟 關鍵邏輯：在按下右上角儲存前，檢查輸入框裡是不是還有字沒送出
+            // 如果有，就當作他最後輸入的一個標籤，自動幫他加進去！
+            val pendingText = labelInput.text.toString().trim()
+            if (pendingText.isNotEmpty()) {
+                addTagDirectly(pendingText)
+                labelInput.text.clear()
+            }
+
+            // 然後繼續執行儲存
             if (portfolioImageUrl != null) {
                 imageUrl = portfolioImageUrl
                 saveToFirestore(db, portfolioImageUrl!!)
@@ -139,18 +144,33 @@ class New_clothes : AppCompatActivity() {
         val email = FirebaseAuth.getInstance().currentUser?.email ?: return
         val category = findViewById<TextView>(R.id.Classification_name).text.toString()
 
+        val selectedScenarios = mutableListOf<String>()
+        if (findViewById<CheckBox>(R.id.cb_work).isChecked) selectedScenarios.add("職場商務")
+        if (findViewById<CheckBox>(R.id.cb_school).isChecked) selectedScenarios.add("校園日常")
+        if (findViewById<CheckBox>(R.id.cb_casual).isChecked) selectedScenarios.add("休閒娛樂")
+        if (findViewById<CheckBox>(R.id.cb_sport).isChecked) selectedScenarios.add("戶外運動")
+        if (findViewById<CheckBox>(R.id.cb_special).isChecked) selectedScenarios.add("特殊場合")
+
+        val seasonTag = when (findViewById<RadioGroup>(R.id.rg_season).checkedRadioButtonId) {
+            R.id.rb_hot -> "炎熱(薄)"
+            R.id.rb_warm -> "涼爽(適中)"
+            R.id.rb_cold -> "寒冷(厚)"
+            else -> "涼爽(適中)"
+        }
+
         val data = hashMapOf(
             "服裝種類" to category,
             "顏色" to selectedColor,
             "圖片網址" to imageUrl,
             "圖片完整網址" to fullUrl,
             "標籤" to labelTexts,
+            "適合情境" to selectedScenarios,
+            "適合氣溫" to seasonTag,
             "timestamp" to com.google.firebase.Timestamp.now()
         )
 
         db.collection(email).add(data).addOnSuccessListener {
             Toast.makeText(this, "新增完成！", Toast.LENGTH_SHORT).show()
-            // 🌟 已經幫妳改成跳轉到 Wardrobe (衣櫃) 了！
             startActivity(Intent(this, Wardrobe::class.java))
             finish()
         }.addOnFailureListener { e ->
@@ -159,7 +179,14 @@ class New_clothes : AppCompatActivity() {
         }
     }
 
-    // --- 輔助方法 ---
+    private fun addTagDirectly(text: String) {
+        if (!labelList.contains(text)) {
+            labelList.add(text)
+            labelTexts.add(text)
+            adapter.notifyItemInserted(labelList.size - 1)
+        }
+    }
+
     private fun getImageUriFromBitmap(context: Context, bitmap: Bitmap): Uri? {
         val file = File(context.cacheDir, "${UUID.randomUUID()}.jpg")
         return try {
