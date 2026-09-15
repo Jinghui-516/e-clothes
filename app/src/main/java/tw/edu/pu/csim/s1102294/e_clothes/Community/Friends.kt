@@ -25,7 +25,7 @@ class Friends : AppCompatActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
-    private var searchedEmail: String = "" // 雖然用名稱搜，但背後還是記住 Email 才能加好友
+    private var searchedEmail: String = ""
 
     lateinit var etSearch: EditText
     lateinit var btnSearch: Button
@@ -45,7 +45,7 @@ class Friends : AppCompatActivity() {
         btnBack.setOnClickListener { finish() }
 
         etSearch = findViewById(R.id.et_search_username)
-        etSearch.hint = "請輸入對方的使用者名稱..." // 🌟 提示改回使用者名稱
+        etSearch.hint = "請輸入對方的使用者名稱..."
 
         btnSearch = findViewById(R.id.btn_search)
         cardResult = findViewById(R.id.card_search_result)
@@ -60,7 +60,7 @@ class Friends : AppCompatActivity() {
         btnSearch.setOnClickListener {
             val nameToSearch = etSearch.text.toString().trim()
             if (nameToSearch.isNotEmpty()) {
-                searchUserInFirestore(nameToSearch) // 🌟 傳入使用者名稱
+                searchUserInFirestore(nameToSearch)
             } else {
                 Toast.makeText(this, "請輸入要搜尋的使用者名稱", Toast.LENGTH_SHORT).show()
             }
@@ -75,20 +75,16 @@ class Friends : AppCompatActivity() {
         loadMyFriendsList()
     }
 
-    // 🌟 全新升級：用「使用者名稱」跨資料夾搜尋
+    // 用「使用者名稱」跨資料夾搜尋
     private fun searchUserInFirestore(searchName: String) {
         val myEmail = auth.currentUser?.email ?: return
 
-        // 使用 collectionGroup 掃描全站所有的「個人資料」文件
         db.collectionGroup("個人資料")
             .whereEqualTo("使用者名稱", searchName)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 if (!querySnapshot.isEmpty) {
-                    // 搜到了！(假設名稱不重複，我們取第一個結果)
                     val doc = querySnapshot.documents[0]
-
-                    // 🌟 魔法步驟：從找到的文件路徑中，反向推導出這個人的 Email (資料夾名稱)
                     val targetEmail = doc.reference.parent.id
 
                     if (targetEmail == myEmail) {
@@ -96,7 +92,6 @@ class Friends : AppCompatActivity() {
                         return@addOnSuccessListener
                     }
 
-                    // 記錄對方的 Email 準備加好友，並顯示卡片
                     searchedEmail = targetEmail
                     cardResult.visibility = View.VISIBLE
                     tvResultName.text = "@${doc.getString("使用者名稱") ?: "未設定"}"
@@ -112,26 +107,45 @@ class Friends : AppCompatActivity() {
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "搜尋失敗，請稍後再試", Toast.LENGTH_SHORT).show()
-                // 🌟 把真正的錯誤原因印在下方的 Logcat 裡面，裡面藏著建立索引的網址！
-                Log.e("SearchError", "Firebase 搜尋失敗原因 (請點擊網址建立索引): ", e)
+                Log.e("SearchError", "Firebase 搜尋失敗原因: ", e)
             }
     }
 
-    // 雙向加好友 (保持原樣，因為底層還是用 Email 溝通)
+    // 🌟 雙向加好友（加入通知開關判斷）
     private fun addFriendToDatabase(friendEmail: String) {
         val myEmail = auth.currentUser?.email ?: return
 
-        db.collection(myEmail).document("friends")
-            .set(hashMapOf("list" to FieldValue.arrayUnion(friendEmail)), com.google.firebase.firestore.SetOptions.merge())
-            .addOnSuccessListener {
-                db.collection(friendEmail).document("friends")
-                    .set(hashMapOf("list" to FieldValue.arrayUnion(myEmail)), com.google.firebase.firestore.SetOptions.merge())
-
-                Toast.makeText(this, "加好友成功！", Toast.LENGTH_SHORT).show()
-                cardResult.visibility = View.GONE
-                etSearch.text.clear()
-                loadMyFriendsList()
+        // 1. 先去檢查對方的通知設定
+        db.collection("users").document(friendEmail).get().addOnSuccessListener { doc ->
+            val isFriendNotificationsEnabled = if (doc.exists()) {
+                doc.getBoolean("notificationsEnabled") ?: true
+            } else {
+                true
             }
+
+            // 2. 執行雙向加好友
+            db.collection(myEmail).document("friends")
+                .set(hashMapOf("list" to FieldValue.arrayUnion(friendEmail)), com.google.firebase.firestore.SetOptions.merge())
+                .addOnSuccessListener {
+                    db.collection(friendEmail).document("friends")
+                        .set(hashMapOf("list" to FieldValue.arrayUnion(myEmail)), com.google.firebase.firestore.SetOptions.merge())
+
+                    Toast.makeText(this, "加好友成功！", Toast.LENGTH_SHORT).show()
+                    cardResult.visibility = View.GONE
+                    etSearch.text.clear()
+                    loadMyFriendsList()
+
+                    // 3. 如果對方開啟了通知，才寫入通知或觸發後續提醒
+                    if (isFriendNotificationsEnabled) {
+                        // 可以在這裡寫入對方的通知資料庫（若有實作通知中心的話）
+                        val notificationData = hashMapOf(
+                            "message" to "新朋友加入：$myEmail",
+                            "timestamp" to System.currentTimeMillis()
+                        )
+                        db.collection(friendEmail).document("Notifications").collection("List").add(notificationData)
+                    }
+                }
+        }
     }
 
     // 讀取好友清單

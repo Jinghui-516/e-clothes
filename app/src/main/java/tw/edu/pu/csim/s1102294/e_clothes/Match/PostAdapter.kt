@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.DiffUtil // 🌟 新增匯入差異計算工具
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
@@ -17,7 +18,8 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import tw.edu.pu.csim.s1120336.e_fit.R
 
-class PostAdapter(private val postList: MutableList<Post>) : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
+// 🌟 修改 1：將括號裡的 val 改成 var，讓清單資料可以被抽換
+class PostAdapter(private var postList: MutableList<Post>) : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
 
     private val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email ?: ""
     private val db = FirebaseFirestore.getInstance()
@@ -36,7 +38,7 @@ class PostAdapter(private val postList: MutableList<Post>) : RecyclerView.Adapte
         val tvViewAllComments: TextView = v.findViewById(R.id.tv_view_all_comments)
         val tvCommentPreview1: TextView = v.findViewById(R.id.tv_comment_preview_1)
         val tvCommentPreview2: TextView = v.findViewById(R.id.tv_comment_preview_2)
-        val btnBookmark: ImageView = v.findViewById(R.id.btn_post_bookmark) // 🌟 珍藏按鈕
+        val btnBookmark: ImageView = v.findViewById(R.id.btn_post_bookmark)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -54,7 +56,6 @@ class PostAdapter(private val postList: MutableList<Post>) : RecyclerView.Adapte
         holder.viewPager.adapter = ImageSliderAdapter(post.imageUrls)
         TabLayoutMediator(holder.tabLayout, holder.viewPager) { _, _ -> }.attach()
 
-        // 🌟 點讚邏輯
         val isLiked = post.likedBy.contains(currentUserEmail)
         holder.btnLike.setImageResource(if (isLiked) R.drawable.ic_clothes else R.drawable.ic_hanger)
         holder.tvLikesCount.text = post.likedBy.size.toString()
@@ -73,25 +74,20 @@ class PostAdapter(private val postList: MutableList<Post>) : RecyclerView.Adapte
             }
         }
 
-        // 🌟 珍藏邏輯 (查詢狀態、切換圖示、取消與加入)
         val postImageUrl = post.imageUrls.firstOrNull()
         if (postImageUrl != null && currentUserEmail.isNotEmpty()) {
             val collectionRef = db.collection(currentUserEmail).document("我的珍藏").collection("items")
 
-            // 1. 每次載入貼文時，先去資料庫查這張圖是不是已經被珍藏過
             collectionRef.whereEqualTo("imageUrl", postImageUrl).get().addOnSuccessListener { snapshot ->
                 var isBookmarked = !snapshot.isEmpty
                 var savedDocId = if (isBookmarked) snapshot.documents.first().id else null
 
-                // 設定初始圖示 (假設填滿的圖示叫做 ic_bookmark_filled)
                 holder.btnBookmark.setImageResource(if (isBookmarked) R.drawable.ic_bookmark_filled else R.drawable.ic_bookmark)
 
-                // 2. 處理點擊事件
                 holder.btnBookmark.setOnClickListener {
-                    holder.btnBookmark.isEnabled = false // 防連點
+                    holder.btnBookmark.isEnabled = false
 
                     if (isBookmarked && savedDocId != null) {
-                        // 已經珍藏了 -> 執行「取消珍藏」，並把圖示變回空心
                         collectionRef.document(savedDocId!!).delete().addOnSuccessListener {
                             isBookmarked = false
                             savedDocId = null
@@ -100,7 +96,6 @@ class PostAdapter(private val postList: MutableList<Post>) : RecyclerView.Adapte
                             Toast.makeText(holder.itemView.context, "已取消珍藏", Toast.LENGTH_SHORT).show()
                         }
                     } else {
-                        // 還沒珍藏 -> 執行「加入珍藏」，並把圖示變成填滿
                         val savedData = hashMapOf(
                             "imageUrl" to postImageUrl,
                             "timestamp" to com.google.firebase.Timestamp.now()
@@ -117,7 +112,6 @@ class PostAdapter(private val postList: MutableList<Post>) : RecyclerView.Adapte
             }
         }
 
-        // 🌟 留言邏輯
         holder.tvCommentsCount.text = post.commentCount.toString()
         holder.tvViewAllComments.visibility = if (post.commentCount > 0) View.VISIBLE else View.GONE
         holder.tvViewAllComments.text = "查看全部 ${post.commentCount} 則留言"
@@ -139,6 +133,31 @@ class PostAdapter(private val postList: MutableList<Post>) : RecyclerView.Adapte
     }
 
     override fun getItemCount() = postList.size
+
+    // 🌟 修改 2：新增資料局部更新的魔法函數
+    fun updateData(newPosts: List<Post>) {
+        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize() = postList.size
+            override fun getNewListSize() = newPosts.size
+
+            // 判斷是不是同一篇貼文
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return postList[oldItemPosition].postId == newPosts[newItemPosition].postId
+            }
+
+            // 判斷貼文內容是否有變動（例如按讚數變了）
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                val old = postList[oldItemPosition]
+                val new = newPosts[newItemPosition]
+                return old.likedBy.size == new.likedBy.size &&
+                        old.commentCount == new.commentCount
+            }
+        })
+
+        // 把新資料蓋過去，並請系統執行「局部平滑更新」
+        this.postList = newPosts.toMutableList()
+        diffResult.dispatchUpdatesTo(this)
+    }
 
     inner class ImageSliderAdapter(private val images: List<String>) : RecyclerView.Adapter<ImageSliderAdapter.ImgViewHolder>() {
         inner class ImgViewHolder(v: View) : RecyclerView.ViewHolder(v) {

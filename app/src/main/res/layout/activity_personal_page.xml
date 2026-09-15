@@ -92,6 +92,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless" />
 
                     <ImageView
+                        android:id="@+id/iv_camera"
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:layout_gravity="bottom|end"
@@ -144,8 +145,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:background="@drawable/corners_login"
-                android:padding="16dp"
+                android:padding="4dp"
                 android:text="點擊這裡編輯你的個性簽名..."
                 android:textColor="@color/text_primary"
                 android:textSize="15sp"

@@ -30,6 +30,11 @@
         android:theme="@style/Theme.Eclothes"
         tools:targetApi="31">
 
+
+        <activity
+            android:name=".Match.PostDetailActivity"
+            android:exported="false" />
+
         <!-- 🌟 幫妳把 add_skirt 註冊在這裡了！ -->
         <activity
             android:name=".clothes.add_skirt"

@@ -41,6 +41,7 @@ class Personal_Page : AppCompatActivity() {
     private lateinit var rvPersonalGrid: RecyclerView
     private lateinit var btnEditTags: ImageView
     private lateinit var btnSettingsPage: ImageView
+    private lateinit var ivCamera: ImageView
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -68,11 +69,13 @@ class Personal_Page : AppCompatActivity() {
         rvPersonalGrid = findViewById(R.id.rv_personal_grid)
         btnEditTags = findViewById(R.id.btn_edit_tags)
         btnSettingsPage = findViewById(R.id.btn_settings_page)
+        ivCamera = findViewById(R.id.iv_camera)
 
         rvPersonalGrid.layoutManager = GridLayoutManager(this, 3)
 
         val isMe = (targetEmail == auth.currentUser?.email)
         if (isMe) {
+            ivCamera.visibility = View.VISIBLE
             btnSettingsPage.visibility = View.VISIBLE
             btnSettingsPage.setOnClickListener {
                 startActivity(Intent(this, Setting::class.java))
@@ -87,20 +90,24 @@ class Personal_Page : AppCompatActivity() {
             birthdayTextView.setOnClickListener { showEditDialog("生日", "修改生日", birthdayTextView) }
             btnEditTags.setOnClickListener { startActivity(Intent(this, Edit_Label::class.java)) }
         } else {
+            ivCamera.visibility = View.GONE
             btnEditTags.visibility = View.GONE
             btnSettingsPage.visibility = View.GONE
+
+            // 🌟 確保看別人的時候，自介跟名字絕對不能被點擊修改
+            nameTextView.isClickable = false
+            signatureTextView.isClickable = false
+            birthdayTextView.isClickable = false
         }
 
         fetchUserData(targetEmail)
         loadUserStyles(targetEmail)
-
-        // 🌟 把 isMe 傳遞進去，用來判斷能不能刪除
         fetchMyHistoryPosts(targetEmail, isMe)
 
-        setupNavigation()
+        // 🌟 將 isMe 傳入，讓導覽列知道目前處於誰的主頁
+        setupNavigation(isMe)
     }
 
-    // 🌟 修改：傳入 isMe，並且同時抓取貼文的 ID (用 Pair 包裝)
     private fun fetchMyHistoryPosts(email: String, isMe: Boolean) {
         db.collection("AllPosts")
             .whereEqualTo("userEmail", email)
@@ -114,7 +121,6 @@ class Personal_Page : AppCompatActivity() {
                         .whereEqualTo("userEmail", email)
                         .get()
                         .addOnSuccessListener { fallbackSnapshot ->
-                            // 🌟 抓取 doc.id 和圖片網址
                             val posts = fallbackSnapshot.documents.mapNotNull { doc ->
                                 val urls = doc.get("imageUrls") as? List<*>
                                 if (!urls.isNullOrEmpty()) Pair(doc.id, urls[0].toString()) else null
@@ -124,7 +130,6 @@ class Personal_Page : AppCompatActivity() {
                     return@addSnapshotListener
                 }
 
-                // 🌟 抓取 doc.id 和圖片網址
                 val posts = snapshot?.documents?.mapNotNull { doc ->
                     val urls = doc.get("imageUrls") as? List<*>
                     if (!urls.isNullOrEmpty()) Pair(doc.id, urls[0].toString()) else null
@@ -162,13 +167,25 @@ class Personal_Page : AppCompatActivity() {
 
     private fun dpToPx(dp: Float): Float = dp * resources.displayMetrics.density
 
+    // 🌟 更新資料時，即時判斷是否為空字串並處理預設提示文字
     private fun showEditDialog(field: String, title: String, target: TextView) {
-        val et = EditText(this).apply { setText(target.text.toString().replace("@", "")) }
+        var currentText = target.text.toString().replace("@", "")
+        if (currentText == "✎ 點擊新增個人簡介..." || currentText == "這人很懶，什麼都沒留...") {
+            currentText = ""
+        }
+
+        val et = EditText(this).apply { setText(currentText) }
         AlertDialog.Builder(this).setTitle(title).setView(et)
             .setPositiveButton("更新") { _, _ ->
-                val v = et.text.toString()
+                val v = et.text.toString().trim()
                 db.collection(targetEmail).document("個人資料").update(field, v).addOnSuccessListener {
-                    target.text = if (field == "使用者名稱") "@$v" else v
+                    if (field == "使用者名稱") {
+                        target.text = if (v.isEmpty()) "@未設定" else "@$v"
+                    } else if (field == "個性簽名" && v.isEmpty()) {
+                        target.text = "✎ 點擊新增個人簡介..."
+                    } else {
+                        target.text = v
+                    }
                 }
             }.show()
     }
@@ -184,30 +201,58 @@ class Personal_Page : AppCompatActivity() {
         }
     }
 
+    // 🌟 抓取資料時，如果自介是空的，給予相對應的提示
     private fun fetchUserData(email: String) {
+        val isMe = (email == auth.currentUser?.email)
         db.collection(email).document("個人資料").get().addOnSuccessListener { doc ->
             nameTextView.text = "@${doc.getString("使用者名稱") ?: "未設定"}"
-            signatureTextView.text = doc.getString("個性簽名") ?: "這人很懶，什麼都沒留..."
+
+            val bio = doc.getString("個性簽名")
+            if (bio.isNullOrEmpty()) {
+                signatureTextView.text = if (isMe) "✎ 點擊新增個人簡介..." else "這人很懶，什麼都沒留..."
+            } else {
+                signatureTextView.text = bio
+            }
+
             birthdayTextView.text = doc.getString("生日") ?: "未設定"
             doc.getString("頭貼圖片")?.let { Glide.with(this).load(it).into(circularImageView) }
         }
     }
 
-    private fun setupNavigation() {
+    // 🌟 接收 isMe 參數，設定正確的選取狀態與點擊邏輯
+    private fun setupNavigation(isMe: Boolean) {
         val nav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        nav.selectedItemId = R.id.nav_profile
+
+        // 看自己主頁時亮「個人」，看好友主頁時亮「社群」
+        if (isMe) {
+            nav.selectedItemId = R.id.nav_profile
+        } else {
+            nav.selectedItemId = R.id.nav_community
+        }
+
         nav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_weather -> { startActivity(Intent(this, home::class.java)); finish(); true }
                 R.id.nav_wardrobe -> { startActivity(Intent(this, Wardrobe::class.java)); finish(); true }
                 R.id.nav_rank -> { startActivity(Intent(this, Rank::class.java)); finish(); true }
-                R.id.nav_community -> { startActivity(Intent(this, Match_home::class.java)); finish(); true }
+                R.id.nav_community -> {
+                    startActivity(Intent(this, Match_home::class.java))
+                    finish()
+                    true
+                }
+                R.id.nav_profile -> {
+                    // 🌟 如果現在是看朋友的主頁，點擊個人按鈕就會「跳回自己的主頁」！
+                    if (!isMe) {
+                        startActivity(Intent(this, Personal_Page::class.java))
+                        finish()
+                    }
+                    true
+                }
                 else -> false
             }
         }
     }
 
-    // 🌟 修改：接收 Pair 資料型態 (包含 docId 和圖片網址)，並接收 isMe 判斷權限
     inner class PersonalGridAdapter(
         private val posts: List<Pair<String, String>>,
         private val isMe: Boolean
@@ -222,7 +267,6 @@ class Personal_Page : AppCompatActivity() {
 
             Glide.with(holder.itemView.context).load(imageUrl).into(holder.itemView.findViewById(R.id.iv_grid_image))
 
-            // 🌟 核心刪除邏輯：如果是自己的貼文，才開放長按刪除功能
             if (isMe) {
                 holder.itemView.setOnLongClickListener {
                     AlertDialog.Builder(this@Personal_Page)
@@ -242,7 +286,6 @@ class Personal_Page : AppCompatActivity() {
                     true
                 }
             } else {
-                // 如果是看別人的檔案，停用長按功能
                 holder.itemView.setOnLongClickListener(null)
             }
         }

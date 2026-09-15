@@ -5,7 +5,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View // 🌟 補上 View 匯入
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.activity.result.PickVisualMediaRequest
@@ -18,7 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
-import tw.edu.pu.csim.s1120336.e_fit.Community.Friends // 🌟 補上 Friends 匯入
+import tw.edu.pu.csim.s1120336.e_fit.Community.Friends
 import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
 import tw.edu.pu.csim.s1120336.e_fit.R
 import tw.edu.pu.csim.s1120336.e_fit.clothes.Wardrobe
@@ -30,8 +30,11 @@ class Match_home : AppCompatActivity() {
     private lateinit var fabAddPost: FloatingActionButton
     private lateinit var matchRecyclerView: RecyclerView
     private lateinit var btnChatRoom: ImageView
-    private lateinit var btnSearchFriendsBar: View // 🌟 宣告頂部搜尋框變數
+    private lateinit var btnSearchFriendsBar: View
     private val db = FirebaseFirestore.getInstance()
+
+    // 🌟 1. 宣告一個全域變數來記住 Adapter，不要每次都重新產生
+    private var postAdapter: PostAdapter? = null
 
     // 多選照片啟動器
     private val pickMultipleImageLauncher = registerForActivityResult(
@@ -49,37 +52,29 @@ class Match_home : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_match_home)
 
-        // 1. 初始化 UI 元件
         matchRecyclerView = findViewById(R.id.match_recycler_view)
         fabAddPost = findViewById(R.id.fab_add_post)
         bottomNavigationView = findViewById(R.id.bottom_navigation)
 
-        // 2. 綁定右上角聊天室按鈕
         btnChatRoom = findViewById(R.id.btn_chat_room)
         btnChatRoom.setOnClickListener {
             val intent = Intent(this, ChatListActivity::class.java)
             startActivity(intent)
         }
 
-        // 🌟 3. 綁定頂部長圓角搜尋框，點擊跳轉到加好友頁面
         btnSearchFriendsBar = findViewById(R.id.btn_search_friends_bar)
         btnSearchFriendsBar.setOnClickListener {
             val intent = Intent(this, Friends::class.java)
             startActivity(intent)
         }
 
-        // 4. 設定 RecyclerView
         matchRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        // 5. 點擊 + 號彈出選單
         fabAddPost.setOnClickListener {
             showPostOptions()
         }
 
-        // 6. 從資料庫抓取貼文
         fetchPosts()
-
-        // 7. 導覽列邏輯
         setupNavigation()
     }
 
@@ -96,7 +91,21 @@ class Match_home : AppCompatActivity() {
                     posts.add(post)
                 }
 
-                matchRecyclerView.adapter = PostAdapter(posts)
+                // 🌟 2. 核心防護機制：如果還沒有 Adapter 就建立，如果有了就只更新資料
+                if (postAdapter == null) {
+                    // 第一次載入，給予新的 Adapter
+                    postAdapter = PostAdapter(posts)
+                    matchRecyclerView.adapter = postAdapter
+                } else {
+                    // 記住現在滑動到的位置
+                    val recyclerViewState = matchRecyclerView.layoutManager?.onSaveInstanceState()
+
+                    // 只替換 Adapter 裡面的資料，不重新創造整個列表
+                    postAdapter?.updateData(posts)
+
+                    // 恢復剛才的滑動位置
+                    matchRecyclerView.layoutManager?.onRestoreInstanceState(recyclerViewState)
+                }
             }
     }
 

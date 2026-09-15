@@ -14,7 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import tw.edu.pu.csim.s1120336.e_fit.R
 
-// 🌟 統一在這裡定義，確保沒有匯入衝突
+// 統一在這裡定義，確保沒有匯入衝突
 data class ChatMessage(
     val sender: String = "",
     val text: String = "",
@@ -63,13 +63,41 @@ class ChatRoomActivity : AppCompatActivity() {
     private fun sendMessage(text: String) {
         val timestamp = System.currentTimeMillis()
         val msg = ChatMessage(myEmail, text, timestamp)
+
+        // 1. 儲存訊息到聊天室資料庫
         db.collection("Chats").document(roomId).collection("Messages").add(msg)
 
-        val chatDataForMe = hashMapOf("lastMessage" to text, "timestamp" to timestamp, "friendEmail" to friendEmail, "friendName" to friendName, "friendAvatar" to friendAvatar)
-        val chatDataForFriend = hashMapOf("lastMessage" to text, "timestamp" to timestamp, "friendEmail" to myEmail, "friendName" to (FirebaseAuth.getInstance().currentUser?.displayName ?: "我"), "friendAvatar" to "")
+        // 2. 🌟 檢查對方的通知設定，落實使用者隱私意願
+        db.collection("users").document(friendEmail).get().addOnSuccessListener { doc ->
+            val isFriendNotificationsEnabled = if (doc.exists()) {
+                doc.getBoolean("notificationsEnabled") ?: true
+            } else {
+                true
+            }
 
-        db.collection(myEmail).document("RecentChats").collection("Rooms").document(friendEmail).set(chatDataForMe)
-        db.collection(friendEmail).document("RecentChats").collection("Rooms").document(myEmail).set(chatDataForFriend)
+            // 自己的聊天室列表隨時更新
+            val chatDataForMe = hashMapOf(
+                "lastMessage" to text,
+                "timestamp" to timestamp,
+                "friendEmail" to friendEmail,
+                "friendName" to friendName,
+                "friendAvatar" to friendAvatar
+            )
+            db.collection(myEmail).document("RecentChats").collection("Rooms").document(friendEmail).set(chatDataForMe)
+
+            // 如果對方開啟了通知，才寫入對方的最新聊天室清單中
+            if (isFriendNotificationsEnabled) {
+                val chatDataForFriend = hashMapOf(
+                    "lastMessage" to text,
+                    "timestamp" to timestamp,
+                    "friendEmail" to myEmail,
+                    "friendName" to (FirebaseAuth.getInstance().currentUser?.displayName ?: "我"),
+                    "friendAvatar" to ""
+                )
+                db.collection(friendEmail).document("RecentChats").collection("Rooms").document(myEmail).set(chatDataForFriend)
+            }
+        }
+
         etMessage.text.clear()
     }
 
@@ -83,7 +111,7 @@ class ChatRoomActivity : AppCompatActivity() {
             }
     }
 
-    // 🌟 直接內嵌在同一個檔案裡，確保 Adapter 認得 ChatMessage
+    // 內部專用的聊天訊息 Adapter
     inner class ChatAdapter(private val list: List<ChatMessage>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             object : RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_chat_message, parent, false)) {}

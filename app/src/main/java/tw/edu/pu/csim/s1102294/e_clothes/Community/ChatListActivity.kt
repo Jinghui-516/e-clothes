@@ -21,7 +21,7 @@ class ChatListActivity : AppCompatActivity() {
     private val myEmail = FirebaseAuth.getInstance().currentUser?.email ?: ""
     private lateinit var rvChatList: RecyclerView
 
-    data class ChatRoom(val friendEmail: String, val friendName: String, val friendAvatar: String)
+    data class ChatRoom(val friendEmail: String, var friendName: String, var friendAvatar: String)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,9 +34,39 @@ class ChatListActivity : AppCompatActivity() {
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, _ ->
                 val chatRooms = snapshot?.map { doc ->
-                    ChatRoom(doc.getString("friendEmail")!!, doc.getString("friendName")!!, doc.getString("friendAvatar")!!)
+                    ChatRoom(
+                        friendEmail = doc.getString("friendEmail") ?: "",
+                        friendName = doc.getString("friendName") ?: "使用者",
+                        friendAvatar = doc.getString("friendAvatar") ?: ""
+                    )
                 } ?: emptyList()
-                rvChatList.adapter = ChatListAdapter(chatRooms)
+
+                if (chatRooms.isEmpty()) {
+                    rvChatList.adapter = ChatListAdapter(emptyList())
+                    return@addSnapshotListener
+                }
+
+                // 🌟 動態去抓取每個好友最新的真實暱稱與頭貼，覆蓋掉錯誤的「我」
+                var count = 0
+                for (room in chatRooms) {
+                    db.collection(room.friendEmail).document("個人資料").get()
+                        .addOnSuccessListener { fDoc ->
+                            if (fDoc.exists()) {
+                                room.friendName = fDoc.getString("使用者名稱") ?: room.friendName
+                                room.friendAvatar = fDoc.getString("頭貼圖片") ?: room.friendAvatar
+                            }
+                            count++
+                            if (count == chatRooms.size) {
+                                rvChatList.adapter = ChatListAdapter(chatRooms)
+                            }
+                        }
+                        .addOnFailureListener {
+                            count++
+                            if (count == chatRooms.size) {
+                                rvChatList.adapter = ChatListAdapter(chatRooms)
+                            }
+                        }
+                }
             }
     }
 
@@ -47,7 +77,13 @@ class ChatListActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
             val room = list[position]
             holder.itemView.findViewById<TextView>(R.id.tv_friend_name).text = room.friendName
-            Glide.with(holder.itemView.context).load(room.friendAvatar).placeholder(R.drawable.user).into(holder.itemView.findViewById(R.id.iv_friend_avatar))
+
+            // 載入真實頭貼，若無則顯示預設圖
+            Glide.with(holder.itemView.context)
+                .load(room.friendAvatar)
+                .placeholder(R.drawable.user)
+                .into(holder.itemView.findViewById(R.id.iv_friend_avatar))
+
             holder.itemView.setOnClickListener {
                 startActivity(Intent(this@ChatListActivity, ChatRoomActivity::class.java).apply {
                     putExtra("FRIEND_EMAIL", room.friendEmail)

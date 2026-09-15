@@ -11,7 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide // 🌟 補上 Glide 匯入
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -27,12 +27,14 @@ class Rank : AppCompatActivity() {
 
     private val db = FirebaseFirestore.getInstance()
 
-    // 🌟 修正資料結構：加入 userAvatar 用來記錄頭貼網址
+    // 🌟 修正資料結構：加入 postId 來記錄這是哪一篇貼文
     data class RankData(
         val name: String = "",
         val caption: String = "",
         val likesCount: Int = 0,
-        val userAvatar: String = "" // 🌟 新增頭貼網址欄位
+        val postImageUrl: String = "",
+        val userEmail: String = "",
+        val postId: String = "" // 👈 新增這個欄位
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,10 +44,8 @@ class Rank : AppCompatActivity() {
         rankRecyclerView = findViewById(R.id.rank_recycler_view)
         rankRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        // 核心功能：從 Firebase 撈取真實數據並進行排行排序
         fetchRealRankData()
 
-        // 3. 導覽列邏輯
         bottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.selectedItemId = R.id.nav_rank
         bottomNavigationView.setOnItemSelectedListener { item ->
@@ -75,45 +75,47 @@ class Rank : AppCompatActivity() {
         }
     }
 
-    // 從 Firestore 即時動態撈取並統計排行
     private fun fetchRealRankData() {
         db.collection("AllPosts").get().addOnSuccessListener { documents ->
             val realRankList = mutableListOf<RankData>()
 
             for (document in documents) {
+                val postId = document.id // 🌟 抓取這篇貼文在資料庫的專屬 ID
                 val name = document.getString("userName") ?: "匿名使用者"
                 val caption = document.getString("caption") ?: ""
-                val avatar = document.getString("userAvatar") ?: "" // 🌟 抓取雲端貼文裡的頭貼網址
+                val userEmail = document.getString("userEmail") ?: ""
 
-                // 抓取 likedBy 陣列的大小當作真實讚數
+                // 抓取貼文裡的照片陣列，並取第一張圖
+                val imageUrls = document.get("imageUrls") as? List<*>
+                val postImageUrl = imageUrls?.firstOrNull()?.toString() ?: ""
+
                 val likedBy = document.get("likedBy") as? List<*>
                 val likesCount = likedBy?.size ?: 0
 
-                realRankList.add(RankData(name, caption, likesCount, avatar))
+                // 🌟 記得把 postId 也放進去
+                realRankList.add(RankData(name, caption, likesCount, postImageUrl, userEmail, postId))
             }
 
-            // 根據「讚數」由多到少排序，最高只留下前 10 名
             val sortedRankList = realRankList
                 .sortedByDescending { it.likesCount }
                 .take(10)
 
-            // 將真實數據餵給畫面
             rankRecyclerView.adapter = RankAdapter(sortedRankList)
         }
     }
 
-    // 排行榜專用 Adapter
     inner class RankAdapter(private val list: List<RankData>) : RecyclerView.Adapter<RankAdapter.ViewHolder>() {
         inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-            val tvRank = v.findViewById<TextView>(R.id.tv_rank_number)
-            val tvName = v.findViewById<TextView>(R.id.tv_rank_name)
-            val tvStyle = v.findViewById<TextView>(R.id.tv_rank_style)
-            val tvLikes = v.findViewById<TextView>(R.id.tv_rank_likes)
-            val ivAvatar = v.findViewById<ImageView>(R.id.iv_rank_avatar) // 🌟 修正重點 1：宣告並綁定畫面上的頭貼 ImageView
+            val tvRankNumber = v.findViewById<TextView>(R.id.tv_rank_number)
+            val ivCrown = v.findViewById<ImageView>(R.id.iv_crown)
+            val ivPostImage = v.findViewById<ImageView>(R.id.iv_post_image)
+            val tvUsername = v.findViewById<TextView>(R.id.tv_username)
+            val tvCaption = v.findViewById<TextView>(R.id.tv_caption)
+            val tvLikesCount = v.findViewById<TextView>(R.id.tv_likes_count)
+            val btnViewOutfit = v.findViewById<TextView>(R.id.btn_view_outfit)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            // 💡 確保妳的 item_rank.xml 裡面存放頭貼的 ImageView ID 真的叫做 iv_rank_avatar
             val view = LayoutInflater.from(parent.context).inflate(R.layout.item_rank, parent, false)
             return ViewHolder(view)
         }
@@ -121,25 +123,31 @@ class Rank : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val data = list[position]
             val rank = position + 1
-            holder.tvRank.text = rank.toString()
-            holder.tvName.text = data.name
 
-            // 將原本顯示風格標籤的地方，動態換成使用者的「貼文內文」
-            holder.tvStyle.text = if (data.caption.length > 10) data.caption.take(10) + "..." else data.caption
-            holder.tvLikes.text = data.likesCount.toString()
+            holder.tvRankNumber.text = rank.toString()
+            holder.tvUsername.text = data.name
+            holder.tvCaption.text = data.caption
+            holder.tvLikesCount.text = data.likesCount.toString()
 
-            // 🌟 修正重點 2：動態使用 Glide 將使用者的頭貼網址下載下來並塞進排行榜畫面
+            // 皇冠邏輯：只有前三名顯示皇冠
+            if (rank <= 3) {
+                holder.ivCrown.visibility = View.VISIBLE
+            } else {
+                holder.ivCrown.visibility = View.GONE
+            }
+
+            // 載入穿搭照片
             Glide.with(holder.itemView.context)
-                .load(data.userAvatar)
-                .placeholder(R.drawable.user) // 如果網路太慢或沒頭貼，預設顯示原本的人頭圖
-                .into(holder.ivAvatar)
+                .load(data.postImageUrl)
+                .placeholder(R.drawable.user) // 若無圖片的預設圖
+                .into(holder.ivPostImage)
 
-            // 針對前三名給予特殊顏色
-            when (rank) {
-                1 -> holder.tvRank.setTextColor(Color.parseColor("#FFD700")) // 金色
-                2 -> holder.tvRank.setTextColor(Color.parseColor("#C0C0C0")) // 銀色
-                3 -> holder.tvRank.setTextColor(Color.parseColor("#CD7F32")) // 銅色
-                else -> holder.tvRank.setTextColor(Color.parseColor("#8E8E8E")) // 普通灰色
+            // 🌟 點擊「查看穿搭」按鈕，精準跳轉到單篇貼文詳細頁
+            holder.btnViewOutfit.setOnClickListener {
+                val intent = Intent(holder.itemView.context, PostDetailActivity::class.java)
+                // 傳遞貼文 ID，讓 PostDetailActivity 讀取該篇貼文資料
+                intent.putExtra("POST_ID", data.postId)
+                holder.itemView.context.startActivity(intent)
             }
         }
 
