@@ -78,22 +78,22 @@
             android:paddingHorizontal="140dp"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- 2. 上衣軌道 -->
+        <!-- 2. 上衣軌道 (🌟 把高度從 220 增加到 350dp，讓洋裝有空間展開) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_tops"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:layout_marginTop="160dp"
+            android:layout_height="350dp"
+            android:layout_marginTop="145dp"
             android:clipToPadding="false"
             android:paddingHorizontal="95dp"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- 3. 下著軌道 (🌟 解決超高腰：從 245dp 改成 310dp 往下壓) -->
+        <!-- 3. 下著軌道 (🌟 從 310dp 往上提拉到 275dp，完美對齊裙子的高腰線) -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_bottoms"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:layout_marginTop="310dp"
+            android:layout_height="250dp"
+            android:layout_marginTop="275dp"
             android:clipToPadding="false"
             android:paddingHorizontal="95dp"
             app:layout_constraintTop_toTopOf="parent" />
@@ -109,7 +109,6 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- 🌟 新增：儲存搭配按鈕 (懸浮在右下角) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_save_outfit"
         android:layout_width="wrap_content"

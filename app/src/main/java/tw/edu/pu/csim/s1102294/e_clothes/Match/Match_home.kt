@@ -6,15 +6,20 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 
@@ -33,20 +38,7 @@ class Match_home : AppCompatActivity() {
     private lateinit var btnSearchFriendsBar: View
     private val db = FirebaseFirestore.getInstance()
 
-    // 🌟 1. 宣告一個全域變數來記住 Adapter，不要每次都重新產生
     private var postAdapter: PostAdapter? = null
-
-    // 多選照片啟動器
-    private val pickMultipleImageLauncher = registerForActivityResult(
-        ActivityResultContracts.PickMultipleVisualMedia(9)
-    ) { uris: List<Uri> ->
-        if (uris.isNotEmpty()) {
-            val uriStringList = ArrayList(uris.map { it.toString() })
-            val intent = Intent(this, share_Match::class.java)
-            intent.putStringArrayListExtra("selected_images_uris", uriStringList)
-            startActivity(intent)
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,19 +83,12 @@ class Match_home : AppCompatActivity() {
                     posts.add(post)
                 }
 
-                // 🌟 2. 核心防護機制：如果還沒有 Adapter 就建立，如果有了就只更新資料
                 if (postAdapter == null) {
-                    // 第一次載入，給予新的 Adapter
                     postAdapter = PostAdapter(posts)
                     matchRecyclerView.adapter = postAdapter
                 } else {
-                    // 記住現在滑動到的位置
                     val recyclerViewState = matchRecyclerView.layoutManager?.onSaveInstanceState()
-
-                    // 只替換 Adapter 裡面的資料，不重新創造整個列表
                     postAdapter?.updateData(posts)
-
-                    // 恢復剛才的滑動位置
                     matchRecyclerView.layoutManager?.onRestoreInstanceState(recyclerViewState)
                 }
             }
@@ -118,9 +103,7 @@ class Match_home : AppCompatActivity() {
 
         btnPhoto.setOnClickListener {
             dialog.dismiss()
-            pickMultipleImageLauncher.launch(
-                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-            )
+            fetchAndShowCategories()
         }
 
         btnText.setOnClickListener {
@@ -130,6 +113,153 @@ class Match_home : AppCompatActivity() {
 
         dialog.setContentView(view)
         dialog.show()
+    }
+
+    private fun fetchAndShowCategories() {
+        val email = FirebaseAuth.getInstance().currentUser?.email ?: return
+
+        db.collection(email).document("我的搭配").collection("items")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val allOutfits = snapshot.documents.mapNotNull {
+                    val url = it.getString("imageUrl")
+                    val category = it.getString("category") ?: "未分類"
+                    if (url != null) Pair(url, category) else null
+                }
+
+                if (allOutfits.isEmpty()) {
+                    Toast.makeText(this, "您的搭配庫目前是空的唷！", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+
+                showCategorySelectionDialog(allOutfits)
+            }
+    }
+
+    private fun showCategorySelectionDialog(allOutfits: List<Pair<String, String>>) {
+        val recyclerView = RecyclerView(this).apply {
+            layoutManager = GridLayoutManager(this@Match_home, 2)
+            setPadding(16, 16, 16, 16)
+            clipToPadding = false
+        }
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("請選擇穿搭情境 📁")
+            .setView(recyclerView)
+            .setNegativeButton("取消", null)
+            .show() // 先 show 出來才能改大小
+
+        // 🌟 把彈出視窗拉大：寬度 95%，高度 85% (更接近全螢幕)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
+        )
+
+        val categories = allOutfits.map { it.second }.distinct()
+
+        recyclerView.adapter = CategorySelectionAdapter(categories, allOutfits) { selectedCategory ->
+            dialog.dismiss()
+            showOutfitSelectionDialog(allOutfits, selectedCategory)
+        }
+    }
+
+    private fun showOutfitSelectionDialog(allOutfits: List<Pair<String, String>>, selectedCategory: String) {
+        val filteredOutfits = allOutfits.filter { it.second == selectedCategory }
+
+        val recyclerView = RecyclerView(this).apply {
+            // 🌟 恢復一排兩張 (雙欄)
+            layoutManager = GridLayoutManager(this@Match_home, 2)
+            setPadding(16, 16, 16, 16)
+            clipToPadding = false
+        }
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("分享搭配：$selectedCategory")
+            .setView(recyclerView)
+            .setNeutralButton("🔙 返回分類") { _, _ ->
+                showCategorySelectionDialog(allOutfits)
+            }
+            .setNegativeButton("取消", null)
+            .show() // 先 show 出來才能改大小
+
+        // 🌟 同樣把選照片的視窗也拉大：寬度 95%，高度 85%
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
+        )
+
+        recyclerView.adapter = OutfitSelectionAdapter(filteredOutfits.map { it.first }) { selectedUrl ->
+            dialog.dismiss()
+            val uriStringList = ArrayList(listOf(selectedUrl))
+            val intent = Intent(this, share_Match::class.java)
+            intent.putStringArrayListExtra("selected_images_uris", uriStringList)
+            startActivity(intent)
+        }
+    }
+
+    inner class CategorySelectionAdapter(
+        private val categories: List<String>,
+        private val allOutfits: List<Pair<String, String>>,
+        private val onClick: (String) -> Unit
+    ) : RecyclerView.Adapter<CategorySelectionAdapter.ViewHolder>() {
+
+        inner class ViewHolder(val layout: LinearLayout, val tvCategory: TextView, val tvCount: TextView) : RecyclerView.ViewHolder(layout)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val context = parent.context
+            val layout = LinearLayout(context).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { setMargins(16, 16, 16, 16) }
+                gravity = android.view.Gravity.CENTER
+                setBackgroundColor(android.graphics.Color.parseColor("#F5F0E6"))
+                setPadding(0, 60, 0, 60)
+            }
+            val icon = TextView(context).apply { text = "📁"; textSize = 40f; gravity = android.view.Gravity.CENTER }
+            val tvCategory = TextView(context).apply { textSize = 18f; setTextColor(android.graphics.Color.DKGRAY); setTypeface(null, android.graphics.Typeface.BOLD); gravity = android.view.Gravity.CENTER }
+            val tvCount = TextView(context).apply { textSize = 14f; setTextColor(android.graphics.Color.GRAY); gravity = android.view.Gravity.CENTER; setPadding(0, 10, 0, 0) }
+
+            layout.addView(icon)
+            layout.addView(tvCategory)
+            layout.addView(tvCount)
+            return ViewHolder(layout, tvCategory, tvCount)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val category = categories[position]
+            holder.tvCategory.text = category
+            val count = allOutfits.count { it.second == category }
+            holder.tvCount.text = "$count 套搭配"
+            holder.layout.setOnClickListener { onClick(category) }
+        }
+        override fun getItemCount() = categories.size
+    }
+
+    inner class OutfitSelectionAdapter(private val urls: List<String>, private val onOutfitClick: (String) -> Unit) : RecyclerView.Adapter<OutfitSelectionAdapter.ViewHolder>() {
+        inner class ViewHolder(val imageView: ImageView) : RecyclerView.ViewHolder(imageView)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val imageView = ImageView(parent.context).apply {
+                val layoutParams = RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    // 🌟 恢復原本適合雙欄的 200dp 高度
+                    (200 * resources.displayMetrics.density).toInt()
+                )
+                layoutParams.setMargins(12, 12, 12, 12)
+                this.layoutParams = layoutParams
+                scaleType = ImageView.ScaleType.FIT_CENTER
+                setBackgroundColor(android.graphics.Color.parseColor("#F9F9F9"))
+            }
+            return ViewHolder(imageView)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val url = urls[position]
+            Glide.with(holder.imageView.context).load(url).into(holder.imageView)
+            holder.imageView.setOnClickListener { onOutfitClick(url) }
+        }
+
+        override fun getItemCount() = urls.size
     }
 
     private fun setupNavigation() {

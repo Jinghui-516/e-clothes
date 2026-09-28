@@ -27,7 +27,9 @@ import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
+
 import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
+import tw.edu.pu.csim.s1120336.e_fit.FittingRoomActivity
 import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
 import tw.edu.pu.csim.s1120336.e_fit.Match.Rank
 import tw.edu.pu.csim.s1120336.e_fit.R
@@ -38,6 +40,7 @@ class Wardrobe : AppCompatActivity() {
     lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var fabAddClothes: FloatingActionButton
     private lateinit var fabAiRobot: FloatingActionButton
+    private lateinit var fabFittingRoom: FloatingActionButton
 
     lateinit var hatImagesContainer: LinearLayout
     private val hatImageViews = mutableListOf<ImageView>()
@@ -73,6 +76,11 @@ class Wardrobe : AppCompatActivity() {
 
         fabAddClothes = findViewById(R.id.fab_add_clothes)
         fabAddClothes.setOnClickListener { startActivity(Intent(this, choose_add::class.java)) }
+
+        fabFittingRoom = findViewById(R.id.fab_fitting_room)
+        fabFittingRoom.setOnClickListener {
+            startActivity(Intent(this, FittingRoomActivity::class.java))
+        }
 
         layoutTitleSelector = findViewById(R.id.layout_title_selector)
         tvMainTitle = findViewById(R.id.tv_main_title)
@@ -140,6 +148,9 @@ class Wardrobe : AppCompatActivity() {
 
         refreshWardrobe()
         fetchMyOutfitsData()
+
+        // 🌟 初始化畫面狀態為「我的衣櫃」
+        switchToWardrobe()
     }
 
     private fun enableTitleDropdown(enable: Boolean) {
@@ -156,12 +167,12 @@ class Wardrobe : AppCompatActivity() {
                 val popup = PopupMenu(this@Wardrobe, view)
                 popup.menu.add(0, 1, 0, "我的衣櫃")
                 popup.menu.add(0, 2, 1, "我的搭配")
-                popup.menu.add(0, 3, 2, "我的珍藏") // 🌟 新增珍藏選項
+                popup.menu.add(0, 3, 2, "我的珍藏")
                 popup.setOnMenuItemClickListener { item ->
                     when (item.itemId) {
                         1 -> { switchToWardrobe(); true }
                         2 -> { switchToOutfits(); true }
-                        3 -> { switchToSavedPosts(); true } // 🌟 切換到珍藏頁面
+                        3 -> { switchToSavedPosts(); true }
                         else -> false
                     }
                 }
@@ -182,7 +193,11 @@ class Wardrobe : AppCompatActivity() {
         layoutWardrobeContent.visibility = View.VISIBLE
         layoutOutfitsContent.visibility = View.GONE
 
+        // 🌟 衣櫃頁面：只顯示新增與機器人，隱藏搭配按鈕
         fabAddClothes.show()
+        fabFittingRoom.hide()
+        fabAiRobot.show()
+
         enableTitleDropdown(true)
     }
 
@@ -192,14 +207,15 @@ class Wardrobe : AppCompatActivity() {
         layoutWardrobeContent.visibility = View.GONE
         layoutOutfitsContent.visibility = View.VISIBLE
 
+        // 🌟 搭配頁面：顯示搭配按鈕與機器人，隱藏加號
         fabAddClothes.hide()
+        fabFittingRoom.show()
+        fabAiRobot.show()
+
         enableTitleDropdown(true)
         showCategoryView()
     }
 
-    // ==========================================
-    // 🌟 全新功能：切換到「我的珍藏」頁面
-    // ==========================================
     private fun switchToSavedPosts() {
         tvMainTitle.text = "我的珍藏"
         tvSubtitle.text = "你收藏的穿搭靈感都在這 ✨"
@@ -209,9 +225,12 @@ class Wardrobe : AppCompatActivity() {
         layoutWardrobeContent.visibility = View.GONE
         layoutOutfitsContent.visibility = View.VISIBLE
 
+        // 🌟 珍藏頁面：隱藏所有按鈕
         fabAddClothes.hide()
-        enableTitleDropdown(true)
+        fabFittingRoom.hide()
+        fabAiRobot.hide()
 
+        enableTitleDropdown(true)
         fetchSavedPostsData()
     }
 
@@ -221,7 +240,6 @@ class Wardrobe : AppCompatActivity() {
         val rvOutfitsGrid = findViewById<RecyclerView>(R.id.rv_outfits_grid)
         rvOutfitsGrid.layoutManager = GridLayoutManager(this, 2)
 
-        // 讀取「我的珍藏」資料夾裡面的圖片
         db.collection(email).document("我的珍藏").collection("items")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
@@ -236,13 +254,14 @@ class Wardrobe : AppCompatActivity() {
             }
     }
 
-    // ==========================================
-    // 🌟 內部篩選專用
-    // ==========================================
     private fun openCategoryGrid(categoryName: String) {
         layoutWardrobeContent.visibility = View.GONE
         layoutOutfitsContent.visibility = View.VISIBLE
+
+        // 🌟 進入單一分類網格時，隱藏新增與搭配按鈕
         fabAddClothes.hide()
+        fabFittingRoom.hide()
+        fabAiRobot.show()
 
         tvMainTitle.text = "我的$categoryName"
         enableTitleDropdown(false)
@@ -336,9 +355,6 @@ class Wardrobe : AppCompatActivity() {
         }
     }
 
-    // ==========================================
-    // 🌟 原有功能區塊 + 珍藏網格
-    // ==========================================
     inner class ClothesGridAdapter(private val items: List<Pair<String, String>>) : RecyclerView.Adapter<ClothesGridAdapter.ViewHolder>() {
         inner class ViewHolder(val layout: LinearLayout, val imageView: ImageView) : RecyclerView.ViewHolder(layout)
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -387,7 +403,6 @@ class Wardrobe : AppCompatActivity() {
         override fun getItemCount() = items.size
     }
 
-    // 🌟 新增：珍藏專用的 Adapter (長按會解除珍藏)
     inner class SavedPostsAdapter(private val savedItems: List<Pair<String, String>>) : RecyclerView.Adapter<SavedPostsAdapter.SavedViewHolder>() {
         inner class SavedViewHolder(val layout: LinearLayout, val imageView: ImageView) : RecyclerView.ViewHolder(layout)
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SavedViewHolder {

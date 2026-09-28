@@ -208,21 +208,7 @@
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/bottom_nav_menu" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_clothes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/fab_ai_robot"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="12dp"
-        android:src="@android:drawable/ic_input_add"
-        app:tint="@color/white"
-        app:backgroundTint="#8D7B68"
-        app:elevation="6dp"
-        app:fabSize="normal"
-        android:contentDescription="新增衣服" />
-
+    <!-- 🌟 最下層：機器人按鈕 -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_ai_robot"
         android:layout_width="wrap_content"
@@ -237,5 +223,37 @@
         app:elevation="6dp"
         app:fabSize="normal"
         android:contentDescription="AI 穿搭助手" />
+
+    <!-- 🌟 中間層：首頁搬過來的衣服按鈕 (置於機器人上方) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_fitting_room"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/fab_ai_robot"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="12dp"
+        android:src="@drawable/ic_clothes"
+        app:tint="@color/white"
+        app:backgroundTint="@color/brand_primary"
+        app:elevation="6dp"
+        app:fabSize="normal"
+        android:contentDescription="進入試衣間" />
+
+    <!-- 🌟 最上層：新增衣服加號按鈕 (置於衣服按鈕上方) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_clothes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/fab_fitting_room"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="12dp"
+        android:src="@android:drawable/ic_input_add"
+        app:tint="@color/white"
+        app:backgroundTint="@color/brand_primary"
+        app:elevation="6dp"
+        app:fabSize="normal"
+        android:contentDescription="新增衣服" />
 
 </RelativeLayout>

@@ -58,9 +58,6 @@ class FittingRoomActivity : AppCompatActivity() {
         }
     }
 
-    // ==========================================
-    // 🌟 核心功能：選擇分類與截圖上傳
-    // ==========================================
     private fun showSaveOutfitDialog() {
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -101,20 +98,14 @@ class FittingRoomActivity : AppCompatActivity() {
                     spinner.selectedItem.toString()
                 }
 
-                // 📸 1. 執行原始截圖 (不再隱藏元件，確保衣服還在)
                 val rawBitmap = captureViewToBitmap(outfitCaptureArea)
-
-                // ✂️ 2. 使用魔法剪刀，把左右兩側的「懸浮衣服」喀嚓剪掉！
                 val croppedBitmap = cropCenterBitmap(rawBitmap)
-
-                // ☁️ 3. 上傳這張只保留中間的乾淨截圖
                 uploadOutfitToFirebase(croppedBitmap, selectedCategory)
             }
             .setNegativeButton("取消", null)
             .show()
     }
 
-    // 將指定的 View 轉換成圖片 (Bitmap)
     private fun captureViewToBitmap(view: View): Bitmap {
         val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -122,20 +113,13 @@ class FittingRoomActivity : AppCompatActivity() {
         return bitmap
     }
 
-    // ✂️ 裁切中間區塊的魔法函數
     private fun cropCenterBitmap(original: Bitmap): Bitmap {
-        // 🌟 0.5f 代表保留中間「50%」的寬度 (左右各切掉 25%)
-        // 如果妳發現假人的手或衣服被切到了，可以把數字調大 (例如 0.6f)
-        // 如果還是會看到旁邊的衣服，可以把數字調小 (例如 0.45f)
         val keepRatio = 0.5f
-
         val newWidth = (original.width * keepRatio).toInt()
         val startX = (original.width - newWidth) / 2
-
         return Bitmap.createBitmap(original, startX, 0, newWidth, original.height)
     }
 
-    // 上傳至 Firebase
     private fun uploadOutfitToFirebase(bitmap: Bitmap, category: String) {
         val email = FirebaseAuth.getInstance().currentUser?.email ?: return
         val timestamp = System.currentTimeMillis()
@@ -169,7 +153,6 @@ class FittingRoomActivity : AppCompatActivity() {
             btnSaveOutfit.isEnabled = true
         }
     }
-    // ==========================================
 
     private fun setupHorizontalRecyclerView(recyclerView: RecyclerView) {
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
@@ -195,7 +178,7 @@ class FittingRoomActivity : AppCompatActivity() {
                     val item = ClothesItem(type, url)
                     when (type) {
                         "頭飾", "帽子" -> hatList.add(item)
-                        "上衣", "洋裝" -> topList.add(item)
+                        "上衣", "洋裝", "外套" -> topList.add(item) // 🌟 確保外套被分發到上衣軌道
                         "褲子", "裙子" -> bottomList.add(item)
                         "鞋子" -> shoeList.add(item)
                     }
@@ -205,25 +188,23 @@ class FittingRoomActivity : AppCompatActivity() {
             val density = resources.displayMetrics.density
 
             rvHats.adapter = HorizontalClothesAdapter(hatList, (75 * density).toInt(), (75 * density).toInt())
-            rvTops.adapter = HorizontalClothesAdapter(topList, (170 * density).toInt(), (190 * density).toInt())
-            rvBottoms.adapter = HorizontalClothesAdapter(bottomList, (180 * density).toInt(), (220 * density).toInt())
+            rvTops.adapter = HorizontalClothesAdapter(topList, (165 * density).toInt(), (175 * density).toInt())
+            rvBottoms.adapter = HorizontalClothesAdapter(bottomList, (155 * density).toInt(), (230 * density).toInt())
             rvShoes.adapter = HorizontalClothesAdapter(shoeList, (140 * density).toInt(), (110 * density).toInt())
         }
     }
 
     inner class HorizontalClothesAdapter(
         private val items: List<ClothesItem>,
-        private val itemWidth: Int,
-        private val itemHeight: Int
+        private val defaultWidth: Int,
+        private val defaultHeight: Int
     ) : RecyclerView.Adapter<HorizontalClothesAdapter.ViewHolder>() {
 
         inner class ViewHolder(val imageView: ImageView) : RecyclerView.ViewHolder(imageView)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val imageView = ImageView(parent.context).apply {
-                layoutParams = ViewGroup.MarginLayoutParams(itemWidth, itemHeight).apply {
-                    setMargins(40, 0, 40, 0)
-                }
+                layoutParams = ViewGroup.MarginLayoutParams(defaultWidth, defaultHeight)
                 scaleType = ImageView.ScaleType.FIT_CENTER
                 adjustViewBounds = true
             }
@@ -232,6 +213,44 @@ class FittingRoomActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = items[position]
+            val density = holder.imageView.context.resources.displayMetrics.density
+            val layoutParams = holder.imageView.layoutParams as ViewGroup.MarginLayoutParams
+
+            // 🌟 加入外套的專屬尺寸判斷
+            when (item.type) {
+                "洋裝" -> {
+                    layoutParams.width = (165 * density).toInt()
+                    layoutParams.height = (330 * density).toInt()
+                    layoutParams.setMargins((40 * density).toInt(), 0, (40 * density).toInt(), 0)
+                }
+                "上衣" -> {
+                    layoutParams.width = (165 * density).toInt()
+                    layoutParams.height = (175 * density).toInt()
+                    layoutParams.setMargins((40 * density).toInt(), 0, (40 * density).toInt(), 0)
+                }
+                "外套" -> {
+                    layoutParams.width = (175 * density).toInt() // 外套稍微寬一點
+                    layoutParams.height = (180 * density).toInt()
+                    layoutParams.setMargins((40 * density).toInt(), 0, (40 * density).toInt(), 0)
+                }
+                "裙子" -> {
+                    layoutParams.width = (155 * density).toInt()
+                    layoutParams.height = (160 * density).toInt()
+                    layoutParams.setMargins((40 * density).toInt(), 0, (40 * density).toInt(), 0)
+                }
+                "褲子" -> {
+                    layoutParams.width = (145 * density).toInt()
+                    layoutParams.height = (230 * density).toInt()
+                    layoutParams.setMargins((40 * density).toInt(), (10 * density).toInt(), (40 * density).toInt(), 0)
+                }
+                else -> {
+                    layoutParams.width = defaultWidth
+                    layoutParams.height = defaultHeight
+                    layoutParams.setMargins((40 * density).toInt(), 0, (40 * density).toInt(), 0)
+                }
+            }
+            holder.imageView.layoutParams = layoutParams
+
             if (item.url.isEmpty()) {
                 holder.imageView.setImageDrawable(null)
             } else {

@@ -22,17 +22,14 @@ import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import tw.edu.pu.csim.s1120336.e_fit.Community.Personal_Page
-import tw.edu.pu.csim.s1120336.e_fit.FittingRoomActivity
 import tw.edu.pu.csim.s1120336.e_fit.Match.Match
 import tw.edu.pu.csim.s1120336.e_fit.Match.Match_home
-
 import tw.edu.pu.csim.s1120336.e_fit.Match.Rank
 import tw.edu.pu.csim.s1120336.e_fit.clothes.Wardrobe
 import tw.edu.pu.csim.s1120336.e_fit.weather.RetrofitClient
@@ -41,8 +38,6 @@ import tw.edu.pu.csim.s1120336.e_fit.weather.WeatherService
 import tw.edu.pu.csim.s1120336.e_fit.weather.Time
 import java.text.SimpleDateFormat
 import java.util.*
-import tw.edu.pu.csim.s1120336.e_fit.R
-
 
 class home : AppCompatActivity() {
 
@@ -65,13 +60,6 @@ class home : AppCompatActivity() {
                 Glide.with(itemView.context).load(match.上衣圖片網址).into(clothesImageView)
                 Glide.with(itemView.context).load(match.褲子圖片網址).into(pantsImageView)
                 Glide.with(itemView.context).load(match.鞋子圖片網址).into(shoesImageView)
-
-                itemView.setOnClickListener {
-                    // 暫時封印，等之後建好 Matching_details 頁面再打開
-                    // val intent = Intent(itemView.context, Matching_details::class.java)
-                    // intent.putExtra("matchData", match)
-                    // itemView.context.startActivity(intent)
-                }
             }
         }
 
@@ -94,7 +82,6 @@ class home : AppCompatActivity() {
 
     lateinit var profile: ImageView
     lateinit var bottomNavigationView: BottomNavigationView
-    lateinit var fabFittingRoom: FloatingActionButton
 
     private lateinit var weatherService: WeatherService
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -170,11 +157,6 @@ class home : AppCompatActivity() {
             }
         }
 
-        fabFittingRoom = findViewById(R.id.fab_fitting_room)
-        fabFittingRoom.setOnClickListener {
-            startActivity(Intent(this, FittingRoomActivity::class.java))
-        }
-
         locationCity = "臺北市"
         locationTextView = findViewById(R.id.locationTextView)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -212,14 +194,28 @@ class home : AppCompatActivity() {
                 if (location != null) {
                     val latitude = location.latitude
                     val longitude = location.longitude
-                    val geocoder = Geocoder(this, Locale.getDefault())
-                    val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-                    if (addresses?.isNotEmpty() == true) {
-                        val city = addresses[0].adminArea
-                        val cityChinese = taiwanCities[city] ?: city
-                        locationTextView.text = cityChinese ?: "Unknown City"
-                        getWeather(cityChinese)
+
+                    // 🌟 加入的 try-catch 防護網
+                    try {
+                        val geocoder = Geocoder(this, Locale.getDefault())
+                        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+                        if (addresses?.isNotEmpty() == true) {
+                            val city = addresses[0].adminArea
+                            val cityChinese = taiwanCities[city] ?: city
+                            locationTextView.text = cityChinese ?: "臺北市"
+                            getWeather(cityChinese ?: "臺北市")
+                        } else {
+                            locationTextView.text = "臺北市"
+                            getWeather("臺北市")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("LocationError", "定位服務暫時無法使用: ${e.message}")
+                        locationTextView.text = "臺北市"
+                        getWeather("臺北市")
                     }
+                } else {
+                    locationTextView.text = "臺北市"
+                    getWeather("臺北市")
                 }
             }
 
