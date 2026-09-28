@@ -12,7 +12,7 @@
         android:id="@+id/iv_grid_image"
         android:layout_width="match_parent"
         android:layout_height="120dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_default_user" />
+        android:scaleType="fitCenter"
+        android:background="#F9F9F9" />
 
 </com.google.android.material.card.MaterialCardView>

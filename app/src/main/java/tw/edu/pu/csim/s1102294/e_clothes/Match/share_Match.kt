@@ -1,7 +1,6 @@
 package tw.edu.pu.csim.s1120336.e_fit.Match
 
 import android.content.Intent
-import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -57,33 +56,47 @@ class share_Match : AppCompatActivity() {
         }
     }
 
-    // 處理多張圖片上傳
+    // 處理多張圖片上傳 (🌟 加入自動判斷雲端網址與本機檔案)
     private fun startMultiUpload(caption: String) {
         progressBar.visibility = View.VISIBLE
         val uploadedUrls = mutableListOf<String>()
         var uploadCount = 0
 
         for (uri in imageUris) {
-            val ref = FirebaseStorage.getInstance().reference.child("posts/${UUID.randomUUID()}.jpg")
-            ref.putFile(uri).addOnSuccessListener {
-                ref.downloadUrl.addOnSuccessListener { downloadUrl ->
-                    uploadedUrls.add(downloadUrl.toString())
-                    uploadCount++
+            val uriString = uri.toString()
 
-                    // 當所有照片都上傳成功後，才寫入資料庫
-                    if (uploadCount == imageUris.size) {
-                        saveToFirestore(caption, uploadedUrls)
-                    }
+            // 🌟 判斷：如果是已經存在 Firebase 的網址，直接加入清單，免重新上傳！
+            if (uriString.startsWith("http://") || uriString.startsWith("https://")) {
+                uploadedUrls.add(uriString)
+                uploadCount++
+
+                // 檢查是否全部處理完畢
+                if (uploadCount == imageUris.size) {
+                    saveToFirestore(caption, uploadedUrls)
                 }
-            }.addOnFailureListener {
-                progressBar.visibility = View.GONE
-                btnShare.isEnabled = true
-                Toast.makeText(this, "上傳失敗，請重試", Toast.LENGTH_SHORT).show()
+            } else {
+                // 如果是本機相簿的檔案，才執行上傳
+                val ref = FirebaseStorage.getInstance().reference.child("posts/${UUID.randomUUID()}.jpg")
+                ref.putFile(uri).addOnSuccessListener {
+                    ref.downloadUrl.addOnSuccessListener { downloadUrl ->
+                        uploadedUrls.add(downloadUrl.toString())
+                        uploadCount++
+
+                        // 當所有照片都上傳成功後，才寫入資料庫
+                        if (uploadCount == imageUris.size) {
+                            saveToFirestore(caption, uploadedUrls)
+                        }
+                    }
+                }.addOnFailureListener {
+                    progressBar.visibility = View.GONE
+                    btnShare.isEnabled = true
+                    Toast.makeText(this, "上傳失敗，請重試", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
-    // 🌟 修改重點：發文時先抓取個人真實姓名與頭貼，再寫入 AllPosts
+    // 發文時先抓取個人真實姓名與頭貼，再寫入 AllPosts
     private fun saveToFirestore(caption: String, imageUrls: List<String>) {
         val email = auth.currentUser?.email
         if (email == null) {
@@ -105,15 +118,15 @@ class share_Match : AppCompatActivity() {
 
             // 組裝完整的貼文真實資料
             val postData = hashMapOf(
-                "userName" to realName,           // 🌟 寫入真實姓名
-                "userAvatar" to realAvatar,       // 🌟 寫入真實頭貼
+                "userName" to realName,
+                "userAvatar" to realAvatar,
                 "userEmail" to email,
                 "imageUrls" to imageUrls,
                 "caption" to caption,
                 "timestamp" to System.currentTimeMillis(),
                 "likedBy" to listOf<String>(),
-                "commentCount" to 0,              // 🌟 補上新功能需要的留言數
-                "previewComments" to listOf<String>() // 🌟 補上新功能需要的預覽清單
+                "commentCount" to 0,
+                "previewComments" to listOf<String>()
             )
 
             // 正式寫入全域貼文資料庫
@@ -126,7 +139,6 @@ class share_Match : AppCompatActivity() {
                 Toast.makeText(this, "發布失敗，請重試", Toast.LENGTH_SHORT).show()
             }
         }.addOnFailureListener {
-            // 如果抓資料失敗的防呆
             progressBar.visibility = View.GONE
             btnShare.isEnabled = true
             Toast.makeText(this, "讀取個人資料失敗", Toast.LENGTH_SHORT).show()
